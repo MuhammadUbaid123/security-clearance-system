@@ -29,8 +29,6 @@ return new class extends Migration
             $table->string('designation', 256)->nullable();
 
             //User Contact Information
-            $table->string('country_iso2', 3)->nullable();
-            $table->string('country_name', 100)->nullable();
             $table->string('state', 100)->nullable();
             $table->string('user_city', 100)->nullable();
             $table->string('postal_code', 100)->nullable();

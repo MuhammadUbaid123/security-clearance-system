@@ -9,4 +9,11 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
+
+    public $storage = "";
+
+    public function __construct()
+    {
+        $this->storage = config('app.env') == "production"?"local":"local";
+    }
 }
