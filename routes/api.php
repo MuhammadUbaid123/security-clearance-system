@@ -35,4 +35,11 @@ Route::get('/login', [AuthController::class, 'login']); // Login APi
 |--------------------------------------------------------------------------
 */
 
-Route::post('/create-user', [UserController::class, 'createUser']);
+
+/* Create User */
+Route::post('/create-user', [UserController::class, 'createUser'])->middleware('auth:api');
+/* Get single User */
+Route::get('/single-user', [UserController::class, 'singleUser']);
+/* Update User */
+Route::post('/update-user', [UserController::class, 'updateUser']);
+
