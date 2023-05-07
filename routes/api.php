@@ -45,5 +45,7 @@ Route::post('/update-user', [UserController::class, 'updateUser']);
 /* Change User Status */
 Route::get('/change-user-status', [UserController::class, 'changeUserStatus']);
 /* Delete Single user */
-Route::delete('delete-user', [UserController::class, 'deleteUser']);
+Route::delete('/delete-user', [UserController::class, 'deleteUser']);
+/* All users */
+Route::get('/all-users', [UserController::class, 'allUsers']);
 

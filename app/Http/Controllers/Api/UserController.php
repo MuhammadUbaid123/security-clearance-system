@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Intervention\Image\Facades\Image;
@@ -356,4 +357,86 @@ class UserController extends Controller
         ],501);
     }
     
+
+     /* ----------------------------------------------- */
+    /* =============================================== */
+    /*                Get ALL Users                     
+    |* =============================================== *|
+    |* ----------------------------------------------- */
+
+    public function allUsers(Request $request)
+    {
+        $auth_user = Auth::user();
+    
+
+        /* For manual pagination */
+        $page = ($request->page?:1)-1;
+        $record_per_page = 10;
+        $offset = $page * $record_per_page;
+
+        $where = [];
+        if($auth_user->user_type!=='super_admin')
+        {
+            $where["id"] = $auth_user->id;
+        }
+
+        $data = User::where($where);
+
+        $search = $request->search;
+        if($search)
+        {
+            $data->where(function($query) use ($search) {//Group all where queries
+
+                $query->where("users.id", "like", "%".$search."%");
+                    $query->orWhere(DB::raw("concat_ws(' ',users.fname,users.lname)"), "like", "%".$search."%");
+                    $query->orWhere(DB::raw("concat(users.fname,users.lname)"), "like", "%".$search."%");
+                    $query->orWhere("users.email", "like", "%".$search."%");
+                    $query->orWhere(DB::raw("concat_ws(' ',users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
+                    $query->orWhere(DB::raw("concat(users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
+                    $query->orWhere("users.user_city", "like", "%".$search."%");
+                    $query->orWhere("users.department", "like", "%".$search."%");
+                    $query->orWhere("users.user_type", "like", "%".$search."%");
+                    $query->orWhere("users.designation", "like", "%".$search."%");
+                    $query->orWhere("users.salary", "like", "%".$search."%");
+            });
+        }
+
+        $total_users = $data->count();
+        $active_users = User::where('users.status','1')->count();
+        $inactive_users = User::where('users.status','0')->count();
+        $data = $data->orderBy("users.id", "desc")->offset($offset)->limit($record_per_page)->groupBy('users.id')->get();
+
+        if($data)
+        {
+            foreach($data as $user){
+                    
+                /* For Photo */
+                if($user->photo){
+                    $user->photo = Storage::disk($this->storage)->url("images/user/300x300/").$user->photo;
+                }
+                else{
+                    $user->photo = URL::to('/')."/storage/images/user/default-img.png";
+                }    
+            }
+
+            return response()->json([
+                'status_code' => 200,
+                'type' => 'success',
+                "message" => "Operation Performed successfully",
+                'total_users' => $total_users,
+                'active_users' => $active_users,
+                'inactive_users' => $inactive_users,
+                "page"=>$page+1,
+                "data" => $data,
+            ], 200);
+        }
+
+        return response()->json([
+            'status_code' => 501,
+            'type' => 'error',
+            'message' => "Operation Couldn't Perform!",
+            'data' => null
+        ],501);
+
+    }
 }
