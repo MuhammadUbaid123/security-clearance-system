@@ -26,6 +26,7 @@ class UserController extends Controller
         if(!in_array($auth_user->type, $permit_types)){
             return response()->json([
                 'status_code' => 401,
+                'type' => 'error',
                 "message" => "You don't have permission to access this api!",
                 "data" => null
             ], 401);
@@ -48,6 +49,7 @@ class UserController extends Controller
         {
             return response()->json([
                 'status_code' => 400,
+                'type' => 'error',
                 "message" => $validator->messages()->toArray(),
                 "data" => null
             ], 400);
@@ -103,6 +105,7 @@ class UserController extends Controller
 
             return response()->json([
                 'status_code' => 201,
+                'type' => 'success',
                 "message" => 'Operation Performed Successfull!',
                 "data" => $data
             ],201);
@@ -110,6 +113,7 @@ class UserController extends Controller
 
         return response()->json([
             'status_code' => 500,
+            'type' => 'error',
             "message" => 'Operation Could not Performed!',
             "data" => null
         ],500);
@@ -132,6 +136,7 @@ class UserController extends Controller
         {
             return response()->json([
                 'status_code' => 400,
+                'type' => 'error',
                 'message' => $validator->messages()->toArray(),
                 'data' => null
             ],400);
@@ -150,6 +155,7 @@ class UserController extends Controller
 
             return response()->json([
                 'status_code' => 200,
+                'type' => 'success',
                 'message' => 'Operation Performed Successfully!',
                 'data' => $data
             ],200);
@@ -157,6 +163,7 @@ class UserController extends Controller
 
         return response()->json([
             'status_code' => 501,
+            'type' => 'error',
             'message' => 'Operation Could not Performed!',
             'data' => null
         ],501);
@@ -186,6 +193,7 @@ class UserController extends Controller
         {
             return response()->json([
                 'status_code' => 400,
+                'type' => 'error',
                 "message" => $validator->messages()->toArray(),
                 "data" => null
             ], 400);
@@ -240,6 +248,7 @@ class UserController extends Controller
 
             return response()->json([
                 'status_code' => 200,
+                'type' => 'success',
                 'message' => 'Operation Performed Successfully!',
                 'data' => $data
             ],200);
@@ -247,6 +256,7 @@ class UserController extends Controller
         }
         return response()->json([
             'status_code' => 501,
+            'type' => 'error',
             'message' => 'Operation Could not Performed!',
             'data' => null
         ],501);
@@ -255,7 +265,48 @@ class UserController extends Controller
 
     /* ----------------------------------------------- */
     /* =============================================== */
-    /*                  Update Single User                     
+    /*                 Change User Status                     
     |* =============================================== *|
     |* ----------------------------------------------- */
+
+    public function changeUserStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json([
+                'status_code' => 400,
+                'type' => 'error',
+                'message' => $validator->messages()->toArray(),
+                'data' => null
+            ],400);
+        }
+        
+
+        $data = User::find($request->id);
+
+        if($data)
+        {
+            $data->status = !$data->status;
+
+            $data->save();
+
+            return response()->json([
+                'status_code' => 200,
+                'type' => 'success',
+                'message' => 'Operation Performed Successfully!',
+                'data' => $data->status==1?'Approved':'Not-Approved',
+            ],200);
+        }
+
+        return response()->json([
+            'status_code' => 501,
+            'type' => 'error',
+            'message' => 'Operation Performed Successfully!',
+            'data' => null
+        ],501);
+    }
 }

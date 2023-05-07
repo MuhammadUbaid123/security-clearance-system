@@ -42,4 +42,6 @@ Route::post('/create-user', [UserController::class, 'createUser'])->middleware('
 Route::get('/single-user', [UserController::class, 'singleUser']);
 /* Update User */
 Route::post('/update-user', [UserController::class, 'updateUser']);
+/* Change User Status */
+Route::get('/change-user-status', [UserController::class, 'changeUserStatus']);
 
