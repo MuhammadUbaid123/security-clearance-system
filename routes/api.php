@@ -47,5 +47,5 @@ Route::get('/change-user-status', [UserController::class, 'changeUserStatus']);
 /* Delete Single user */
 Route::delete('/delete-user', [UserController::class, 'deleteUser']);
 /* All users */
-Route::get('/all-users', [UserController::class, 'allUsers']);
+Route::get('/all-users', [UserController::class, 'allUsers'])->middleware("auth:api");
 

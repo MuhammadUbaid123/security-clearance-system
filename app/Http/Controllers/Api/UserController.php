@@ -379,8 +379,9 @@ class UserController extends Controller
         {
             $where["id"] = $auth_user->id;
         }
+       
 
-        $data = User::where($where);
+        $data = User::select('users.*')->where($where)->where('status', 1);
 
         $search = $request->search;
         if($search)
@@ -388,23 +389,29 @@ class UserController extends Controller
             $data->where(function($query) use ($search) {//Group all where queries
 
                 $query->where("users.id", "like", "%".$search."%");
-                    $query->orWhere(DB::raw("concat_ws(' ',users.fname,users.lname)"), "like", "%".$search."%");
-                    $query->orWhere(DB::raw("concat(users.fname,users.lname)"), "like", "%".$search."%");
-                    $query->orWhere("users.email", "like", "%".$search."%");
-                    $query->orWhere(DB::raw("concat_ws(' ',users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
-                    $query->orWhere(DB::raw("concat(users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
-                    $query->orWhere("users.user_city", "like", "%".$search."%");
-                    $query->orWhere("users.department", "like", "%".$search."%");
-                    $query->orWhere("users.user_type", "like", "%".$search."%");
-                    $query->orWhere("users.designation", "like", "%".$search."%");
-                    $query->orWhere("users.salary", "like", "%".$search."%");
+                $query->orWhere(DB::raw("concat_ws(' ',users.fname,users.lname)"), "like", "%".$search."%");
+                $query->orWhere(DB::raw("concat(users.fname,users.lname)"), "like", "%".$search."%");
+                $query->orWhere("users.email", "like", "%".$search."%");
+                $query->orWhere(DB::raw("concat_ws(' ',users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
+                $query->orWhere(DB::raw("concat(users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
+                $query->orWhere("users.user_city", "like", "%".$search."%");
+                $query->orWhere("users.department", "like", "%".$search."%");
+                $query->orWhere("users.user_type", "like", "%".$search."%");
+                $query->orWhere("users.designation", "like", "%".$search."%");
+                $query->orWhere("users.salary", "like", "%".$search."%");
             });
         }
 
         $total_users = $data->count();
         $active_users = User::where('users.status','1')->count();
+        
+        $data = $data->orderBy("users.id", "desc")
+            ->offset($offset)
+            ->limit($record_per_page)
+            ->groupBy('id')
+            ->get();
         $inactive_users = User::where('users.status','0')->count();
-        $data = $data->orderBy("users.id", "desc")->offset($offset)->limit($record_per_page)->groupBy('users.id')->get();
+        // return $data;
 
         if($data)
         {
