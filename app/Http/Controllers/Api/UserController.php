@@ -309,4 +309,51 @@ class UserController extends Controller
             'data' => null
         ],501);
     }
+
+
+    /* ----------------------------------------------- */
+    /* =============================================== */
+    /*                Delete User                     
+    |* =============================================== *|
+    |* ----------------------------------------------- */
+    public function deleteUser(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json([
+                'status_code' => 400,
+                'type' => 'error',
+                'message' => $validator->messages()->toArray(),
+                'data' => null
+            ],400);
+        }
+
+        $data = User::find($request->id);
+
+
+        if($data)
+        {
+            $data->delete();
+
+
+            return response()->json([
+                'status_code' => 200,
+                'type' => 'success',
+                'message' => 'Operation Performed Successfully!',
+                'data' => $request->id,
+            ],200);
+        }
+
+        return response()->json([
+            'status_code' => 501,
+            'type' => 'error',
+            'message' => 'Operation Could not Performed!',
+            'data' => null
+        ],501);
+    }
+    
 }
