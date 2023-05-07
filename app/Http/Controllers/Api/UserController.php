@@ -381,7 +381,7 @@ class UserController extends Controller
         }
        
 
-        $data = User::select('users.*')->where($where)->where('status', 1);
+        $data = User::select('users.*')->where($where);
 
         $search = $request->search;
         if($search)
@@ -398,19 +398,18 @@ class UserController extends Controller
                 $query->orWhere("users.department", "like", "%".$search."%");
                 $query->orWhere("users.user_type", "like", "%".$search."%");
                 $query->orWhere("users.designation", "like", "%".$search."%");
-                $query->orWhere("users.salary", "like", "%".$search."%");
             });
         }
 
         $total_users = $data->count();
         $active_users = User::where('users.status','1')->count();
         
+        $inactive_users = User::where('users.status','0')->count();
         $data = $data->orderBy("users.id", "desc")
             ->offset($offset)
             ->limit($record_per_page)
             ->groupBy('id')
             ->get();
-        $inactive_users = User::where('users.status','0')->count();
         // return $data;
 
         if($data)

@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |*/
 Route::get('/login', [AuthController::class, 'login']); // Login APi
-
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api'); // Logout Api
 
 /*
 |--------------------------------------------------------------------------

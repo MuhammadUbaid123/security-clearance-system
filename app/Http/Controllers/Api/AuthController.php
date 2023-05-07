@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    /* ----------------------------------------------- */
+    /* =============================================== */
+    /*                User Login                     
+    |* =============================================== *|
+    |* ----------------------------------------------- */
     public function login(Request $request){
         $validator = Validator::make($request->all(), [
             'email' => 'required',
@@ -78,5 +83,21 @@ class AuthController extends Controller
                     "data" => null
                 ],500);
             }
+    }
+
+
+    /* ----------------------------------------------- */
+    /* =============================================== */
+    /*                  User Logout                    
+    |* =============================================== *|
+    |* ----------------------------------------------- */
+
+    public function logout(){
+        $user = auth()->user()->token();
+        $user->revoke();
+        return response()->json([
+            'status_code' => 200,
+            "message" => "Operation Performed Successfully!"
+        ], 200);
     }
 }
