@@ -22,6 +22,9 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
+            $table->unsignedBigInteger('type_id');
+            $table->foreign('type_id')->references('id')->on('users')->onDelete('cascade');
+
 
             $table->boolean('seen')->default(0);
 

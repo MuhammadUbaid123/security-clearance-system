@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ClearanceRequest;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -48,6 +50,27 @@ class CleranceRequestController extends Controller
 
         if($data)
         {
+            $users = User::select('users.id')->whereNot('users.user_type', 'student')->get();
+
+            
+            for($i=0; $i<count($users); $i++){
+
+                /* Creating Notification */
+                $create_notification = Notification::create([
+                    'name' => $authUser->fname." ".$authUser->lname." Requested for Clearance!",
+                    'type' => "Clearance",
+                    'type_id' => $authUser->id,
+                    'user_id' => $users[$i]->id,
+                ]);
+
+
+                if($create_notification)
+                {
+                    $dataObj = User::select("users.notification_count", "users.id")->where('users.id','=', $users[$i]->id)->first();
+                    $dataObj->notification_count++;
+                    $dataObj->save();
+                }
+            }
             return response()->json([
                 'status_code' => 201,
                 'type'=> 'success',
