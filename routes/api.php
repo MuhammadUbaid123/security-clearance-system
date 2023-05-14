@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CleranceRequestController;
 use App\Http\Controllers\Api\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,17 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-
 /*
 |--------------------------------------------------------------------------
 | Authentication APIS
 |--------------------------------------------------------------------------
 |*/
-Route::get('/login', [AuthController::class, 'login']); // Login APi
+Route::post('/login', [AuthController::class, 'login']); // Login APi
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api'); // Logout Api
 
 /*
@@ -43,7 +37,7 @@ Route::get('/single-user', [UserController::class, 'singleUser'])->middleware('a
 /* Update User */
 Route::post('/update-user', [UserController::class, 'updateUser'])->middleware('auth:api');
 /* Change User Status */
-Route::get('/change-user-status', [UserController::class, 'changeUserStatus'])->middleware('auth:api');
+Route::post('/change-user-status', [UserController::class, 'changeUserStatus'])->middleware('auth:api');
 /* Delete Single user */
 Route::delete('/delete-user', [UserController::class, 'deleteUser'])->middleware('auth:api');
 /* All users */

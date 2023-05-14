@@ -24,7 +24,7 @@ class UserController extends Controller
     {
         $auth_user = Auth::user(); 
         $permit_types = ["super_admin","admin"];
-        if(!in_array($auth_user->type, $permit_types)){
+        if(!in_array($auth_user->user_type, $permit_types)){
             return response()->json([
                 'status_code' => 401,
                 'type' => 'error',
@@ -211,9 +211,11 @@ class UserController extends Controller
             $data->phone_dial_code = $request->phone_dial_code ?? $data->phone_dial_code;
             $data->phone_number = $request->phone_number ?? $data->phone_number;
             $data->department = $request->department ?? $data->department;
+            $data->dob = $request->dob ?? $data->dob;
             $data->state = $request->state ?? $data->state;
             $data->user_city = $request->user_city ?? $data->user_city;
             $data->user_address = $request->user_address ?? $data->user_address;
+            $data->postal_code = $request->postal_code ?? $data->postal_code;
             $data->designation = $request->designation ?? $data->designation;
 
 
@@ -374,14 +376,14 @@ class UserController extends Controller
         $record_per_page = 10;
         $offset = $page * $record_per_page;
 
-        $where = [];
-        if($auth_user->user_type!=='super_admin')
-        {
-            $where["id"] = $auth_user->id;
-        }
+        // $where = [];
+        // if($auth_user->user_type!=='super_admin')
+        // {
+        //     $where["id"] = $auth_user->id;
+        // }
        
 
-        $data = User::select('users.*')->where($where);
+        $data = User::select('users.*')->where('id', '!=', $auth_user->id);
 
         $search = $request->search;
         if($search)

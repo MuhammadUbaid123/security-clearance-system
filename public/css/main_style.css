@@ -1,0 +1,133 @@
+/*
+|----------------------------------------------------------------------------------
+| Bootstrap button drop-down inside responsive table not visible because of scroll
+|----------------------------------------------------------------------------------
+*/
+/* .btn-group {  
+  white-space: nowrap;              
+}
+.btn-group .btn {  
+  float: none;
+  display: inline-block;
+}
+.btn + .dropdown-toggle { 
+  margin-left: -4px;
+} */
+
+
+/* .dropdown-menu{
+  position: static !important;
+} */
+/*
+|--------------------------------------------------------------------------
+| Text Inline
+|--------------------------------------------------------------------------
+*/
+.text_inline{
+  white-space: nowrap;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Hiding the time stamp icon in input type time
+|--------------------------------------------------------------------------
+*/
+input[type="time"]::-webkit-calendar-picker-indicator {
+  background: none;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Page Loader Animation
+|--------------------------------------------------------------------------
+*/
+.ams-loader {
+  position: fixed;
+  /* z-index: 99; */
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(0 0 0 / 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ams-loader.hidden {
+  display: none;
+}
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 8px solid #fff;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #fff transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+}
+@keyframes fadeOut {
+  75% {
+      opacity: 0;
+      visibility: hidden;
+  }
+  100% {
+      opacity: 1;
+      visibility: hidden;
+  }
+}
+
+
+/* Give v-cloak Opacity To Prevent Displaying Variables On Loading Page */
+[v-cloak]{
+ opacity: .1; 
+}
+
+.card-img-top {
+  width: 100%;
+  height: 192px;
+  object-fit: cover;
+  border-top-left-radius: 0.6rem !important;
+  border-top-right-radius: 0.6rem !important;
+}
+
+/* All user Page Styling Starts Here */
+.user_history_profile{
+  height: 153.6px;
+  object-fit: cover;
+  width: 150px !important;
+}
+.user_history_modal_header{
+  z-index: 1;
+  border-bottom: none !important;
+}
+
+.intl-tel-input.separate-dial-code.allow-dropdown.iti-sdc-3 .selected-flag{
+  height: 40px !important;
+}
