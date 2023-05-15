@@ -20,6 +20,16 @@ class CleranceRequestController extends Controller
     {
         $authUser = Auth::user();
 
+        $permit_types = ['student', 'staff'];
+
+        if(!in_array($authUser->user_type, $permit_types)){
+            return response()->json([
+                'status_code' => 401,
+                'type'=> 'error',
+                "message" => "You don't have permission to access this api!",
+            ], 401);
+        }
+
 
         $validator = Validator::make($request->all(), [
             'st_session' => 'required',
@@ -57,7 +67,7 @@ class CleranceRequestController extends Controller
 
         if($data)
         {
-            $users = User::select('users.id')->whereNot('users.user_type', 'student')->get();
+            $users = User::select('users.id')->whereNotIn('users.user_type', ['student', 'staff'])->get();
 
             
             for($i=0; $i<count($users); $i++){
@@ -98,6 +108,17 @@ class CleranceRequestController extends Controller
     /* Get single Clearance Request */
     public function singleClearance(Request $request)
     {
+        $authUser = Auth::user();
+
+        $permit_types = ['student', 'staff'];
+
+        if(in_array($authUser->user_type, $permit_types)){
+            return response()->json([
+                'status_code' => 401,
+                'type'=> 'error',
+                "message" => "You don't have permission to access this api!",
+            ], 401);
+        }
         $validator = Validator::make($request->all(), [
             'request_id' => 'required'
         ]);
@@ -107,12 +128,12 @@ class CleranceRequestController extends Controller
             return response()->json([
                 'status_code' => 400,
                 'type'=> 'error',
-                'message' => $validator->fails(),
+                'message' => $validator->messages()->toArray(),
             ],400);
         }
 
 
-        $data = ClearanceRequest::whhere('id', $request->request_id)->first();
+        $data = ClearanceRequest::where('id', $request->request_id)->first();
 
         if($data)
         {
@@ -138,6 +159,15 @@ class CleranceRequestController extends Controller
     public function actionOnClearaceReq(Request $request)
     {
         $authUser = Auth::user();
+        $permit_types = ['student', 'staff'];
+
+        if(in_array($authUser->user_type, $permit_types)){
+            return response()->json([
+                'status_code' => 401,
+                'type'=> 'error',
+                "message" => "You don't have permission to access this api!",
+            ], 401);
+        }
         $validator = Validator::make($request->all(), [
             'request_id' => 'required'
         ]);

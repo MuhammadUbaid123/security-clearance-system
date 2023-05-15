@@ -15,6 +15,7 @@ class ClearanceRequest extends Model
         'requester_id',
         'session',
         'req_to_members',
+        'request_status',
         'approvedd_by',
     ];
 }

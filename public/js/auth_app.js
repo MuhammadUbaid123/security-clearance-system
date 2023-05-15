@@ -140,6 +140,7 @@ const authApp = new Vue({
          loader.css('display','none');
           
           if(response.data.status_code == 200){
+            console.log(response.data.data)
             if(response.data.data.user_type == 'admin'){
               window.location.href = "/";
             }
