@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 
 class CleranceRequestController extends Controller
@@ -169,7 +171,8 @@ class CleranceRequestController extends Controller
             ], 401);
         }
         $validator = Validator::make($request->all(), [
-            'request_id' => 'required'
+            'request_id' => 'required',
+            'status' => 'required',
         ]);
 
         if($validator->fails())
@@ -181,10 +184,40 @@ class CleranceRequestController extends Controller
             ],400);
         }
 
-        $reqdata = ClearanceRequest::where('id', $request->request_id)->where('')->first();
+        $reqdata = ClearanceRequest::where('id', $request->request_id)->first();
 
         if($reqdata)
         {
+            $exist = ApprovedBy::where('clear_req_id', $reqdata->id)->where('approver_id', $authUser->id)->first();
+
+            // return $exist;exit;
+            if($exist)
+            {
+                $exist->name = $authUser->fname." ".$authUser->lname;
+                $exist->status = $request->status;
+                $exist->save();
+
+                if($exist->status == 1)
+                {
+                    $reqdata->approvedd_by_count++;
+                    $reqdata->save();
+                }
+
+                if($reqdata->approvedd_by_count == $reqdata->req_to_members)
+                {
+                    $reqdata->request_status = 1;
+                    $reqdata->save();
+                }
+
+                return response()->json([
+                    'status_code' => 200,
+                    'type'=> 'success',
+                    'message' => 'Operation Performed Successfully!',
+                    'data' => [
+                        'status' => $exist->status==1?'Approved':'Rejected',
+                    ]
+                ],200);
+            }
             $data = ApprovedBy::create([
                 'user_id' => $reqdata->requester_id,
                 'name' => $authUser->fname." ".$authUser->lname,
@@ -210,6 +243,9 @@ class CleranceRequestController extends Controller
                     'status_code' => 200,
                     'type'=> 'success',
                     'message' => 'Operation Performed Successfully!',
+                    'data' => [
+                        'status' => $data->status==1?'Approved':'Rejected',
+                    ]
                 ],200);
             }
 
@@ -226,6 +262,96 @@ class CleranceRequestController extends Controller
             'type'=> 'error',
             'message' => 'Request Not Found!',
         ],404);
+
+    }
+
+    /* All clearance requests */
+    public function allrequest(Request $request)
+    {
+        $authUser = Auth::user();
+
+        $permit_types = ['student', 'staff'];
+
+        // if(in_array($authUser->user_type, $permit_types)){
+        //     return response()->json([
+        //         'status_code' => 401,
+        //         'type'=> 'error',
+        //         "message" => "You don't have permission to access this api!",
+        //     ], 401);
+        // }
+        /* For manual pagination */
+        $page = ($request->page?:1)-1;
+        $record_per_page = 10;
+        $offset = $page * $record_per_page;
+        
+        $where = [];
+
+        if(in_array($authUser->user_type, $permit_types))
+        {
+            $where = [
+                'requester_id' => $authUser->id
+            ];
+        }
+
+
+        $allReqs = ClearanceRequest::select('clearance_requests.requester_id', 'clearance_requests.session', 'clearance_requests.request_status', 'users.*')->where($where)->leftJoin('users', 'users.id', 'clearance_requests.requester_id');
+
+        $search = $request->search;
+        if($search)
+        {
+            $allReqs->where(function($query) use ($search) {//Group all where queries
+
+                $query->where("users.id", "like", "%".$search."%");
+                $query->orWhere(DB::raw("concat_ws(' ',users.fname,users.lname)"), "like", "%".$search."%");
+                $query->orWhere(DB::raw("concat(users.fname,users.lname)"), "like", "%".$search."%");
+                $query->orWhere("users.email", "like", "%".$search."%");
+                $query->orWhere(DB::raw("concat_ws(' ',users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
+                $query->orWhere(DB::raw("concat(users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
+                $query->orWhere("users.user_city", "like", "%".$search."%");
+                $query->orWhere("users.department", "like", "%".$search."%");
+                $query->orWhere("users.user_type", "like", "%".$search."%");
+                $query->orWhere("users.designation", "like", "%".$search."%");
+                $query->orWhere("clearance_requests.session", "like", "%".$search."%");
+            }); 
+        }
+
+        $total_users = $allReqs->count();
+        $allReqs = $allReqs->orderBy("users.id", "desc")
+            ->offset($offset)
+            ->limit($record_per_page)
+            ->groupBy('id')
+            ->get();
+
+
+        if($allReqs)
+        {
+            foreach($allReqs as $user){
+                    
+                /* For Photo */
+                if($user->photo){
+                    $user->photo = Storage::disk($this->storage)->url("images/user/300x300/").$user->photo;
+                }
+                else{
+                    $user->photo = URL::to('/')."/storage/images/user/default-img.png";
+                }    
+            }
+
+            return response()->json([
+                'status_code' => 200,
+                'type' => 'success',
+                "message" => "Operation Performed successfully",
+                'total_users' => $total_users,
+                "page"=>$page+1,
+                "data" => $allReqs,
+            ], 200);
+        }
+
+        return response()->json([
+            'status_code' => 501,
+            'type' => 'error',
+            'message' => "Operation Couldn't Perform!",
+            'data' => null
+        ],501);
 
     }
 }

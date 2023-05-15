@@ -52,3 +52,9 @@ Route::get('/all-users', [UserController::class, 'allUsers'])->middleware("auth:
 Route::post('/create-clearance-request', [CleranceRequestController::class, 'createRequest'])->middleware('auth:api');
 /* Single clearance Request */
 Route::get('/single-clearance-request', [CleranceRequestController::class, 'singleClearance'])->middleware("auth:api");
+
+/* Action or clearance Request */
+Route::post('/action-on-request', [CleranceRequestController::class, 'actionOnClearaceReq'])->middleware("auth:api");
+
+/* Action or clearance Request */
+Route::get('/all-requests', [CleranceRequestController::class, 'allrequest'])->middleware("auth:api");
