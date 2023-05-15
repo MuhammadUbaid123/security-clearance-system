@@ -48,6 +48,8 @@
                                             <option value="Dean QA&C">Dean QA&C</option>
                                             <option value="Manager Admin">Manager Admin</option>
                                             <option value="Student's supervisor">Student's supervisor</option>
+                                            <option value="student">Student</option>
+                                            <option value="staff">Staff</option>
                                         </select>
                                         </div>
                                     </div>

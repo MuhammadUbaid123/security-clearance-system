@@ -13,7 +13,7 @@
       <ul class="navbar-nav">
 
         <!-- Users (Begin) -->
-        @if($session->user_type == 'admin')
+        @if($session->user_type == 'super_admin' || $session->user_type == 'admin')
         <li class="nav-item user">
           <a class="nav-link user-sect <?=$tab_name=='create_user'|| $tab_name=='edit_user' || $tab_name=='all_users'?'':'collapsed'?>" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="<?=$tab_name=='create_user'|| $tab_name=='edit_user' || $tab_name=='all_users'?'true':'false'?>" aria-controls="collapseExample">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -36,6 +36,30 @@
         </li>
         @endif
         <!-- Users (End) -->
+
+        <!-- Clearance (Begin) -->
+        <li class="nav-item user">
+          <a class="nav-link user-sect <?=$tab_name=='create_clearance' || $tab_name=='all_requests'?'':'collapsed'?>" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="<?=$tab_name=='create_clearance' || $tab_name=='all_requests'?'true':'false'?>" aria-controls="collapseExample">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa fa-user text-dark opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Clearance</span>
+          </a>
+        </li>
+        @if($session->user_type == 'student' || $session->user_type == 'staff')
+        <li class="nav-item collapse ps-5 <?=$tab_name=='create_clearance' || $tab_name=='all_requests'?'show':''?>" id="collapseExample">
+          <a class="nav-link user-sub-list rounded-lg <?=$tab_name=='create_clearance'?'active':''?>" href="{{route('createclearance')}}">
+            <span class="nav-link-text ms-1">Create Clearance</span>
+          </a>
+        </li>
+        @endif
+        
+        <li class="nav-item collapse ps-5 <?=$tab_name=='create_clearance' || $tab_name=='all_requests'?'show':''?>" id="collapseExample">
+          <a class="nav-link user-sub-list allUsers rounded-lg <?=$tab_name=='all_requests'?'active':''?>" href="{{route('allrequests')}}">
+            <span class="nav-link-text ms-1">All Requests</span>
+          </a>
+        </li>
+        <!-- Clearance (End) -->
         
       </ul>
       

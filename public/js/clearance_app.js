@@ -1,22 +1,11 @@
-const userApp = new Vue({
-    el: "#userApp",
+const clearanceApp = new Vue({
+    el: "#clearanceApp",
   
     data(){
       return{
+        start: "",
+        end: "",
 
-        fname: "",
-        lname: "",
-        user_type: "",
-        email: "",
-        department: "",
-        designation: "",
-        user_address: "",
-        state: "",
-        user_city: "",
-        postal_code: "",
-        password: "",
-        confirm_password: "",
-        
         /*
         |--------------------------------------------------------------------------
         | Other Objects
@@ -24,7 +13,7 @@ const userApp = new Vue({
         */
         page: 0,                      // Declaring Variable for Pagination Function
         search: "",                   // Declaring Variable for Search Function
-        all_users: [],
+        all_requests: [],
         delete_user_id: "",           // Declaring Variable for Deleting Blog
 
         user_information: "",
@@ -38,17 +27,8 @@ const userApp = new Vue({
 
         // Flags For User Module
         is_pagination_active: true,             // Initially pagination is active
-        is_get_user_request_sent: false,        // User data request is false initially
-        is_still_user_data: true,               // User data request exist initially
-
-        /*
-        |--------------------------------------------------------------------------
-        | For Image
-        |--------------------------------------------------------------------------
-        */
-        preview_img:"",
-        temp_preview_img:"",
-        photo:"",
+        is_get_request_sent: false,        // User data request is false initially
+        is_still_request_data: true,               // User data request exist initially
 
       }
     },
@@ -57,101 +37,39 @@ const userApp = new Vue({
 
         /*
         |--------------------------------------------------------------------------
-        | Select image to upload 
+        | Create Clearance
         |--------------------------------------------------------------------------
         */
-        selectImage () {
-            this.$refs.fileInput.click()
-        },
-
-        /* Pick the Image file to preview before uploading to database */
-        pickFile () {
-            let input = this.$refs.fileInput
-            let file = input.files
-            if (file && file[0]) {
-                let reader = new FileReader
-                reader.onload = e => {
-                    this.preview_img = e.target.result
-                }
-                reader.readAsDataURL(file[0])
-                this.$emit('input', file[0])
-            }
-            else{
-                this.preview_img = this.temp_preview_img;
-            }
-        },
-
-        /*
-        |--------------------------------------------------------------------------
-        | Create User
-        |--------------------------------------------------------------------------
-        */
-        create_user(){
-            /* Display Error If Phone Number Is not Valid */
-            $("#phone_number-error").removeClass('d-none');
-
-            if($("#create_user_form").valid()){
-                /* Display Error If Phone Number Is Valid */
-                $("#phone_number-error").addClass('d-none');
+        create_clearance(){
+            if($("#create_clearance_form").valid()){
 
                 let loader = $(".ams-loader");
                 loader.css({'display':'flex','z-index':'2000'});
                 
                 let that  = this;
 
-                /* Getting Image For Uploading
-                |--------------------------- */
-                let photo_input = this.$refs.fileInput;
-                let photo = photo_input.files;
-
+               
                 let form_data = new FormData();
 
-                if (photo.length) {
-                    form_data.append('photo', photo[0]);
-                } else {
-                    form_data.append('photo', "");
-                }
+                form_data.append('st_session', that.start+'-'+that.end);
 
-                /* Extracting Values For Phone Number */
-                var phone_iso2 = $("#phone_number").intlTelInput("getSelectedCountryData").iso2;
-                var phone_dial_code = $("#phone_number").intlTelInput("getSelectedCountryData").dialCode;
-                var phone_number = $("#phone_number").val();
-
-                /* date of birth */
-                var dob = $("#dob").val();
-
-                form_data.append('fname', that.fname);
-                form_data.append('lname', that.lname);
-                form_data.append('user_type', that.user_type);
-                form_data.append('email', that.email);
-                form_data.append('department', that.department);
-                form_data.append('phone_iso2', phone_iso2);
-                form_data.append('phone_dial_code', phone_dial_code);
-                form_data.append('phone_number', phone_number);
-                form_data.append('dob', dob);
-                form_data.append('designation', that.designation);
-                form_data.append('state', that.state);
-                form_data.append('user_city', that.user_city);
-                form_data.append('user_address', that.user_address);
-                form_data.append('postal_code', that.postal_code); 
-                form_data.append('password', that.password);
-
-                axios.post('/create-user', form_data)
+                axios.post('/create-clearance', form_data)
                 .then(response => {
                     loader.css('display','none');
                     
                     if(response.data.status_code == 201){
-                        window.location.href = base_url + "all-users";
+                        window.location.href = base_url + "all-requests";
                     }
                     else if(response.data.status_code == 400){
                         $.map(response.data.message,function(elem,index){
                             that.exception_error(elem);
                         });
                     }
-                    else if(response.data.status_code == 422){
-                        $.map(response.data.error_details,function(elem,index){
-                            that.exception_error(elem);
-                        });
+                    else if(response.data.status_code == 409){
+                        that.exception_error(response.data.message);
+                    }
+                    else if(response.data.status_code == 401){
+                        that.redirect_unauthenticated_user();
                     }
                 })
                 .catch(function(error){
@@ -169,13 +87,13 @@ const userApp = new Vue({
         */
         set_filter(){
             let that = this;
-            that.all_users = [];
+            that.all_requests = [];
             that.page = 0;
-            that.get_all_users();
+            that.get_all_requests();
         },
 
-        get_all_users(){
-            this.is_get_user_request_sent = true;
+        get_all_requests(){
+            this.is_get_request_sent = true;
 
             if (this.is_pagination_active) {
                 this.page++;
@@ -186,7 +104,7 @@ const userApp = new Vue({
             let that = this;
             this.show_loading = true;
 
-            axios.post('/get-all-users', {
+            axios.post('/get-all-requests', {
                 page: that.page,
                 search: that.search
             })
@@ -199,46 +117,35 @@ const userApp = new Vue({
                     /* If no posts are coming then we don't need to send request again and need to show All is seen
                     |-------------------------------------------------------------------------------------------- */
                     if (newly_fetch_data.length <= 0) {
-                        that.is_still_user_data = false;
+                        that.is_still_request_data = false;
                     }
                     /* Empty the array when pagination is pending
                     |------------------------------------------ */
                     if (!that.is_pagination_active) {
-                        that.all_users = [];
+                        that.all_requests = [];
                     }
 
-                    that.all_users = that.all_users.concat(newly_fetch_data);
+                    that.all_requests = that.all_requests.concat(newly_fetch_data);
                 } else if (response.data.status_code == 401) {
                     that.redirect_unauthenticated_user();
                 }
 
                 that.is_pagination_active = true;
-                that.is_get_user_request_sent = false;
+                that.is_get_request_sent = false;
             })
             .catch(function (error) {
-                that.is_get_user_request_sent = false;
+                that.is_get_request_sent = false;
                 that.show_loading = false;
                 that.internal_error();
             });
         },
 
-
         /*
         |--------------------------------------------------------------------------
-        | View User
+        | Change Request Status
         |--------------------------------------------------------------------------
         */
-        //  view_user(user_data){
-        //     this.user_information = user_data;
-        //     $("#view_user_modal").modal('show');
-        //  },
-
-        /*
-        |--------------------------------------------------------------------------
-        | Change User Status
-        |--------------------------------------------------------------------------
-        */
-        change_user_status(user_data){
+        change_request_status(request_data){
             /* Loading animation while request is in progress
             |---------------------------------------------- */
             let loader = $(".ams-loader");
@@ -246,17 +153,18 @@ const userApp = new Vue({
 
             let that = this;
 
-            axios.post('/change-user-status', {
-                id: user_data.id
+            axios.post('/action-on-request', {
+                request_id: request_data.id,
+                status: request_data.request_status
             })
             .then(response => {
                 loader.css('display','none');
                 if (response.data.status_code == 200) {
 
                     if(response.data.data == 'Approved'){
-                        user_data.status = true;
-                    } else if(response.data.data == 'Not-Approved'){
-                        user_data.status = false;
+                        request_data.request_status = true;
+                    } else if(response.data.data == 'Rejected'){
+                        request_data.request_status = false;
                     }
 
                 } else if (response.data.status_code == 401) {
@@ -309,7 +217,7 @@ const userApp = new Vue({
                     // To note down deleting Blog index
                     // ----------------------------------
                     let delete_user_index = null;
-                    $.map(that.all_users, function (elem, index) {
+                    $.map(that.all_requests, function (elem, index) {
                         if (elem.id == that.delete_user_id) {
                             delete_user_index = index;
                         }
@@ -317,10 +225,10 @@ const userApp = new Vue({
                     if (delete_user_index !== null) {
                         // Here we remove the index of deleted data from array
                         // ---------------------------------------------------
-                        that.all_users.splice(delete_user_index, 1);
+                        that.all_requests.splice(delete_user_index, 1);
 
-                        if (that.all_users.length <= 0) {
-                            that.is_still_user_data = false;
+                        if (that.all_requests.length <= 0) {
+                            that.is_still_request_data = false;
                         }
                     }
 

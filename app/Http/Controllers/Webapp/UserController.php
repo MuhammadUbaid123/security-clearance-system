@@ -28,7 +28,7 @@ class UserController extends Controller
     public function show_create_user(Request $request){
         $session = $request->session()->get("login_data");
 
-        if($session && $session->user_type == 'admin'){
+        if($session && $session->user_type == 'super_admin' || $session->user_type == 'admin'){
             return view('users.createuser')
             ->with('session', $session)
             ->with('parent_tab', 'users')

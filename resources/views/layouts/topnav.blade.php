@@ -41,9 +41,8 @@
                     </div>
                     <div class="text-xs me-2">
                         <?php 
-                            if($session->user_type == 'admin'){
-                                echo 'Admin';
-                            }
+                            $filter = str_replace('_', ' ', $session->user_type);
+                            echo strtoupper($filter);
                         ?>
                     </div>
                 </div>

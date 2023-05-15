@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Webapp\AuthController;
+use App\Http\Controllers\Webapp\ClearanceController;
 use App\Http\Controllers\Webapp\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -68,5 +69,23 @@ Route::group(['middleware' => ['login_user']], function (){
 
     /* Delete User (API Call) */
     Route::post('/delete-user', [UserController::class, 'delete_user']);
-    
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Clearance Tab
+    |--------------------------------------------------------------------------
+    */
+    /* Show Create Clearance */
+    Route::get('/create-clearance', [ClearanceController::class, 'show_create_clearance'])->name('createclearance');
+    /* Create Clearance (API) */
+    Route::post('/create-clearance', [ClearanceController::class, 'create_clearance']);
+
+    /* Show All Requests */
+    Route::get('/all-requests', [ClearanceController::class, 'show_all_requests'])->name('allrequests');
+    /* Get All requests (API Call) */
+    Route::post('/get-all-requests', [ClearanceController::class, 'get_all_requests']);
+
+    /* Change Request Status (API Call) */
+    Route::post('/action-on-request', [ClearanceController::class, 'change_request_status']);
 });
