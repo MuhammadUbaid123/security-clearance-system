@@ -7,7 +7,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <title>
-    Sign In
+    Sign up
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -27,38 +27,60 @@
   <main class="main-content  mt-0">
     <section>
       <div class="page-header min-vh-100" id="authApp" v-cloak>
+        <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signup-cover.jpg'); background-position: top;">
+        <span class="mask bg-gradient-dark opacity-6"></span>
         <div class="container">
-          <div class="row">
-            <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
-              <div class="card card-plain">
-                <div class="card-header pb-0 text-start">
-                  <h4 class="font-weight-bolder">Sign In</h4>
-                  <p class="mb-0">Enter your email and password to sign In</p>
+            <div class="row justify-content-center">
+            <div class="col-lg-5 text-center mx-auto">
+                <h1 class="text-white mb-2 mt-5">Welcome!</h1>
+                <p class="text-lead text-white">Use these awesome forms to login or create new account in your project for free.</p>
+            </div>
+            </div>
+        </div>
+        </div>
+        <div class="container">
+        <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
+            <div class="col-xl-10 col-lg-8 col-md-12 mx-auto">
+            <div class="card z-index-0 card-profile-bottom">
+                <div class="card-header text-center pt-4">
+                <h5>Registeration form</h5>
                 </div>
+               
                 <div class="card-body">
-                  <form action="#" method="POST" @submit.prevent="signin()" id="signin_form">
-                    <div class="mb-3">
-                      <input type="email" id="email" name="email" v-model="email"  class="form-control form-control-sm" placeholder="Email" aria-label="Email">
-                    </div>
-                    <div class="mb-3">
-                      <input type="password" id="password" name="password"  v-model="password" class="form-control form-control-sm" placeholder="Password" aria-label="Password">
-                    </div>
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-3 mb-0">Sign In</button>
-                    </div>
-                  </form>
+                    <form role="form" class="row">
+                        <div class="mb-3 col-6">
+                            <input type="text" class="form-control" placeholder="First name" aria-label="FName">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <input type="text" class="form-control" placeholder="Last name" aria-label="LName">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <input type="text" class="form-control" placeholder="CNIC" aria-label="CNIC">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <input type="email" class="form-control" placeholder="Email" aria-label="Email">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <input type="password" class="form-control" placeholder="Password" aria-label="Password">
+                        </div>
+                        <div class="mb-3 col-6">
+                            <input type="password" class="form-control" placeholder="Confirm password" aria-label="ConfirPassword">
+                        </div>
+                        <div class="form-check form-check-info text-start">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked>
+                        <label class="form-check-label" for="flexCheckDefault">
+                            I agree the <a href="javascript:;" class="text-dark font-weight-bolder">Terms and Conditions</a>
+                        </label>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+                        </div>
+                        <p class="text-sm mt-3 mb-0">Already have an account? <a href="javascript:;" class="text-dark font-weight-bolder">Sign in</a></p>
+                    </form>
                 </div>
-              </div>
             </div>
-            <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
-              <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden" style="background-image: url('../assets/img/hitec.jpg');
-          background-size: cover  ; background-repeat:no-repeat; background-position:center;">
-                <span class="mask bg-gradient-primary opacity-6"></span>
-                <h4 class="mt-5 text-white font-weight-bolder position-relative">"Welcome to Hitec Clearance System"</h4>
-                <p class="text-white position-relative">"Automation is the embodiment of the old adage; But, automation is much more complex than simply flipping"</p>
-              </div>
             </div>
-          </div>
+        </div>
         </div>
       </div>
     </section>

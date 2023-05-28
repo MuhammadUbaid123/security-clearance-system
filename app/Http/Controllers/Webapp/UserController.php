@@ -20,6 +20,17 @@ class UserController extends Controller
     use Get;
     use Delete;
 
+    public function dashboard(Request $request)
+    {
+        $session = $request->session()->get("login_data");
+
+        if($session)
+        {
+            return view('dashboard')
+            ->with('tab_name','daashboard')
+            ->with('parent_tab', 'dashboard');
+        }
+    }
     /*
     |--------------------------------------------------------------------------
     | Create User

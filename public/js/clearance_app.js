@@ -92,6 +92,7 @@ const clearanceApp = new Vue({
             that.get_all_requests();
         },
 
+        /* Get all clearance requests */
         get_all_requests(){
             this.is_get_request_sent = true;
 

@@ -50,9 +50,9 @@
         if($url_name == '' || $url_name == 'all-users' || $url_name == 'create-user' || $url_name == 'edit-user' || 
           $url_name == 'create-clearance' || $url_name == 'all-requests'){
           $base_url = getenv('Base_URL');
-          $url_image = $base_url.'assets/img/profile_layout_header.jpg';
+          $url_image = $base_url.'assets/img/hitec1.jpeg';
           echo "<div class='position-absolute w-100 min-height-300 top-0' 
-          style='background-image: url(".$url_image."); background-position: center;'>
+          style='background-image: url(".$url_image."); background-position: center; '>
             <span class='mask bg-primary opacity-6'></span>
           </div>";
         }else{

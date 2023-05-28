@@ -13,6 +13,13 @@ class AuthController extends Controller
     use Post;
     use Get;
 
+    /* Signup form */
+    public function show_signup(Request $request)
+    {
+        return view('authentication.signup')
+            ->with('parent_tab', 'signup')
+            ->with('tab_name', 'signup');
+    }
     /*
     |--------------------------------------------------------------------------
     | Show Signin Screen

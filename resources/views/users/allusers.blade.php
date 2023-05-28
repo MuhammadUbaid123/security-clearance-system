@@ -11,7 +11,7 @@
                 <div class="text-secondary">
                     Showing
                     <div class="d-inline-block">
-                        @{{all_users.length}}
+                        @{{all_users.length}} 
                     </div>
                     rows
                 </div>
@@ -74,7 +74,7 @@
                             </td>
                             <td class="text-left text-sm">
                                 <p class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
-                                    @{{user_data.department}}
+                                    @{{user_data?.department?user_data.department:'Not mentioned'}}
                                 </p>
                             </td>
                             <td class="text-left text-sm">

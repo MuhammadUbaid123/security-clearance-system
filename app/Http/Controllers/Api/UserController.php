@@ -97,6 +97,8 @@ class UserController extends Controller
                 //Saving photo in 300x300
                 $img = Image::make($file)->orientate()->resize(300, 300, function ($constraint) {$constraint->aspectRatio();});
                 Storage::disk($this->storage)->put($folder_300x300.$image_name, $img->stream()->__toString(), 'public');
+
+
                 $user_obj = User::find($data->id);
 
                 $user_obj->photo = $image_name;

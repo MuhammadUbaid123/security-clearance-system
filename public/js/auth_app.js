@@ -141,7 +141,7 @@ const authApp = new Vue({
           
           if(response.data.status_code == 200){
             console.log(response.data.data)
-            if(response.data.data.user_type == 'super_admin' || response.data.data.user_type == 'admin'){
+            if(response.data.data.user_type !== 'student' && response.data.data.user_type !== 'staff'){
               window.location.href = "/";
             } else if(response.data.data.user_type == 'student' || response.data.data.user_type == 'staff'){
               window.location.href = "/create-clearance";

@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(['middleware' => ['is_login']], function (){
 
+    /* Signup */
+    Route::get('/signup', [AuthController::class, 'show_signup'])->name('signup');
     /* Account Signin */
     Route::get('/signin', [AuthController::class, 'show_signin'])->name('signin');
     Route::post('/signin', [AuthController::class, 'signin']);
@@ -44,6 +46,8 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 */
 Route::group(['middleware' => ['login_user']], function (){
 
+    // Returning a view of Dashboard from controller by making route here 
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
     /*
     |--------------------------------------------------------------------------
     | User Tab
