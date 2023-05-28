@@ -11,6 +11,112 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+
+    /* ----------------------------------------------- */
+    /* =============================================== */
+    /*                Signup                     
+    |* =============================================== *|
+    |* ----------------------------------------------- */
+
+    public function signup_api(Request $request)
+    {
+        echo "yes";return;
+        $validator = Validator::make($request->all(),[
+            'fname' => 'required',
+            'lname' => 'required',
+            'user_type' => 'required',
+            'designation' => 'required',
+            // 'cnic' => 'required|unique:users,cnic',
+            // 'email' => 'required|unique:users,email',
+            'password' => 'required',
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json([
+                'status_code' => 400,
+                'type' => 'error',
+                "message" => $validator->messages()->toArray(),
+                "data" => null
+            ], 400);
+        }
+
+        /* If user type is staff and not filled the cnic */
+
+        if($request->user_type=='staff' && !$request->cnic)
+        {
+            return response()->json([
+                'status_code' => 400,
+                'type' => 'error',
+                "message" => "CNIC can't be empty!",
+                "data" => null
+            ], 400);
+        }
+
+        /* if user type is student and not filled the email orr filled incorrect format */
+        if($request->user_type=='student')
+        {
+            Validator::extend('custom_email_format', function ($attribute, $value, $parameters, $validator) {
+                $regex = '/^(19|20|21|22|23)-(CS|ME|EE)-(017|001|023|043)$/i';
+            
+                return preg_match($regex, $value);
+            });
+            
+            // Usage:
+            $validator_mail = Validator::make($request->all(), [
+                'email' => 'required|unique:users,custom_email_format',
+            ]);
+            if ($validator_mail->fails()) {
+
+                return response()->json([
+                    'status_code' => 400,
+                    'type' => 'error',
+                    "message" => "Email format is in-correct!",
+                    "data" => null
+                ], 400);
+            }
+        }
+
+        /* If user type is concerned person and not filled the email */
+        if($request->user_type == 'concerned_person' && !$request->email)
+        {
+            return response()->json([
+                'status_code' => 400,
+                'type' => 'error',
+                "message" => "Email format is in-correct!",
+                "data" => null
+            ], 400);
+        }
+
+        $data = User::create([
+            'fname' => $request->fname,
+            'lname' => $request->lname,
+            'user_type' => $request->user_type,
+            'designation' => $request->designation,
+            'cnic' => $request->cnic,
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
+
+
+        if(!$data)
+        {
+            return response()->json([
+                'status_code' => 501,
+                'type' => 'error',
+                "message" => "Unable to perform the signup action, try-again later!",
+                "data" => null
+            ], 501);
+        }
+
+        return response()->json([
+            'status_code' => 501,
+            'type' => 'error',
+            "message" => "Operation performed successfully!",
+        ]);
+
+
+    }
     /* ----------------------------------------------- */
     /* =============================================== */
     /*                User Login                     
@@ -24,6 +130,7 @@ class AuthController extends Controller
         if($validator->fails()){
             return response()->json([
                 'status_code' => 400,
+                'type' => 'error',
                 "message" => $validator->messages()->toArray(),
                 "data" => null
             ], 400);

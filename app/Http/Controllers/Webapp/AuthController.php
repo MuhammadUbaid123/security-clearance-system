@@ -37,7 +37,7 @@ class AuthController extends Controller
     |--------------------------------------------------------------------------
     */
     public function signin(Request $request){
-        $url = env('Api_Base_URL')."api/login";
+        $url = env('API_BASE_URL')."api/login";
 
         $data = array(
             'email' => $request->email,
@@ -65,7 +65,7 @@ class AuthController extends Controller
         $session = $request->session()->get("login_data");
         $token = $session->token;
         if($token){
-            $url = env('Api_Base_URL')."api/logout";
+            $url = env('API_BASE_URL')."api/logout";
             $this->curlLogout($url, $token);
         }
         Session::flush();
