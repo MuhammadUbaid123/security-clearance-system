@@ -379,13 +379,17 @@ class UserController extends Controller
         $offset = $page * $record_per_page;
 
         // $where = [];
-        // if($auth_user->user_type!=='super_admin')
-        // {
-        //     $where["id"] = $auth_user->id;
-        // }
+        if($auth_user->user_type!=='super_admin')
+        {
+            $where["id"] = !$auth_user->id;
+        }
        
+        if($auth_user->user_type=='concerned_person'){
+            $where['user_type'] = ['!=', 'concerned_person'];
+            $where['user_type'] = ['!=', 'super_admin'];
+        }
 
-        $data = User::select('users.*')->where('id', '!=', $auth_user->id);
+        $data = User::select('users.*')->where($where);
 
         $search = $request->search;
         if($search)
@@ -399,6 +403,7 @@ class UserController extends Controller
                 $query->orWhere(DB::raw("concat_ws(' ',users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
                 $query->orWhere(DB::raw("concat(users.phone_dial_code,users.phone_number)"), "like", "%".$search."%");
                 $query->orWhere("users.user_city", "like", "%".$search."%");
+                $query->orWhere("users.cnic", "like", "%".$search."%");
                 $query->orWhere("users.department", "like", "%".$search."%");
                 $query->orWhere("users.user_type", "like", "%".$search."%");
                 $query->orWhere("users.designation", "like", "%".$search."%");

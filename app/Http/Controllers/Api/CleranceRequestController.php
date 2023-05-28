@@ -46,6 +46,7 @@ class CleranceRequestController extends Controller
             ],400);
         }
 
+        /* requester id is basically a staff or student user id */
         $alreadyRequested = ClearanceRequest::where('requester_id', $authUser->id)->first();
         if($alreadyRequested)
         {
@@ -73,6 +74,13 @@ class CleranceRequestController extends Controller
 
             
             for($i=0; $i<count($users); $i++){
+
+                $approved_bies = ApprovedBy::create([
+                    'user_id' => $authUser?->id,
+                    'name' => $authUser?->fname." ".$authUser?->lname,
+                    'clear_req_id' => $data?->id,
+                    'approver_id' => $users[$i]?->id
+                ]);
 
                 /* Creating Notification */
                 $create_notification = Notification::create([
@@ -112,9 +120,9 @@ class CleranceRequestController extends Controller
     {
         $authUser = Auth::user();
 
-        $permit_types = ['student', 'staff'];
+        $permit_types = ['super_admin', 'concerned_person'];
 
-        if(in_array($authUser->user_type, $permit_types)){
+        if(!in_array($authUser->user_type, $permit_types)){
             return response()->json([
                 'status_code' => 401,
                 'type'=> 'error',
@@ -135,6 +143,7 @@ class CleranceRequestController extends Controller
         }
 
 
+        /* fetch single clearance request */
         $data = ClearanceRequest::where('id', $request->request_id)->first();
 
         if($data)
@@ -161,9 +170,9 @@ class CleranceRequestController extends Controller
     public function actionOnClearaceReq(Request $request)
     {
         $authUser = Auth::user();
-        $permit_types = ['student', 'staff'];
+        $permit_types = ['super_admin', 'concerned_person'];
 
-        if(in_array($authUser->user_type, $permit_types)){
+        if(!in_array($authUser->user_type, $permit_types)){
             return response()->json([
                 'status_code' => 401,
                 'type'=> 'error',
@@ -172,7 +181,7 @@ class CleranceRequestController extends Controller
         }
         $validator = Validator::make($request->all(), [
             'request_id' => 'required',
-            'status' => 'required',
+            'request_status' => 'required',
         ]);
 
         if($validator->fails())
@@ -194,10 +203,27 @@ class CleranceRequestController extends Controller
             if($exist)
             {
                 $exist->name = $authUser->fname." ".$authUser->lname;
-                $exist->status = $request->status;
+
+                if($request->request_status=='rejected')
+                {
+                    if(!$request->comments && !$request->miscellaneous)
+                    {
+                        return response()->json([
+                            'status_code' => 400,
+                            'type'=> 'error',
+                            'message' => 'Comments or miscellaneous cant be empty!',
+                        ],400);
+                    }
+                    $exist->comments = $request->comments ?? $exist->comments;
+                    $exist->miscellaneous = $request->miscellaneous ?? $exist->miscellaneous;
+
+                    
+                }else{
+                    $exist->request_status = $request->request_status;
+                }
                 $exist->save();
 
-                if($exist->status == 1)
+                if($exist->request_status == 'accepted')
                 {
                     $reqdata->approvedd_by_count++;
                     $reqdata->save();
@@ -218,36 +244,29 @@ class CleranceRequestController extends Controller
                     ]
                 ],200);
             }
-            $data = ApprovedBy::create([
-                'user_id' => $reqdata->requester_id,
-                'name' => $authUser->fname." ".$authUser->lname,
-                'clear_req_id' => $reqdata->id,
-                'comments' => $request->comments,
-                'status' => $request->status,
-            ]);
 
-            if($data)
-            {
-                if($data->status == 1)
-                {
-                    $reqdata->approvedd_by_count++;
-                    $reqdata->save();
-                }
+            // if($data)
+            // {
+            //     if($data->status == 1)
+            //     {
+            //         $reqdata->approvedd_by_count++;
+            //         $reqdata->save();
+            //     }
 
-                if($reqdata->approvedd_by_count == $reqdata->req_to_members)
-                {
-                    $reqdata->request_status = 1;
-                    $reqdata->save();
-                }
-                return response()->json([
-                    'status_code' => 200,
-                    'type'=> 'success',
-                    'message' => 'Operation Performed Successfully!',
-                    'data' => [
-                        'status' => $data->status==1?'Approved':'Rejected',
-                    ]
-                ],200);
-            }
+            //     if($reqdata->approvedd_by_count == $reqdata->req_to_members)
+            //     {
+            //         $reqdata->request_status = 1;
+            //         $reqdata->save();
+            //     }
+            //     return response()->json([
+            //         'status_code' => 200,
+            //         'type'=> 'success',
+            //         'message' => 'Operation Performed Successfully!',
+            //         'data' => [
+            //             'status' => $data->status==1?'Approved':'Rejected',
+            //         ]
+            //     ],200);
+            // }
 
 
             return response()->json([

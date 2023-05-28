@@ -14,6 +14,8 @@ class ApprovedBy extends Model
     protected $fillable = [
         'user_id',
         'clear_req_id',
+        'request_status',
+        'miscellaneous',
         'comments',
         'status',
     ];
