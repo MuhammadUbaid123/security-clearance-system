@@ -21,7 +21,7 @@
             </a>
           </li> -->
         <!-- Users (Begin) -->
-        @if($session->user_type == 'admin')
+        @if($session->user_type == 'admin' || $session->user_type == 'concerned_person')
           <li class="nav-item user">
             <a class="nav-link user-sect <?=$tab_name=='create_user'|| $tab_name=='edit_user' || $tab_name=='all_users'?'':'collapsed'?>" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="<?=$tab_name=='create_user'|| $tab_name=='edit_user' || $tab_name=='all_users'?'true':'false'?>" aria-controls="collapseExample">
               <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -47,7 +47,7 @@
             <span class="nav-link-text ms-1">Clearance</span>
           </a>
         </li>
-        @if($session->user_type !== 'admin')
+        @if($session->user_type !== 'admin' && $session->user_type !== 'concerned_person')
         <li class="nav-item collapse ps-5 <?=$tab_name=='create_clearance' || $tab_name=='all_requests'?'show':''?>" id="collapseExample2">
           <a class="nav-link clearance-sub-list rounded-lg <?=$tab_name=='create_clearance'?'active':''?>" href="{{route('createclearance')}}">
             <span class="nav-link-text ms-1">Create Clearance</span>

@@ -31,7 +31,7 @@
                         <tr>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">ID</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Author</th>
-                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Department</th>
+                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Type</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Designation</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Session</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Status</th> 
@@ -54,21 +54,27 @@
                                             </div>
                                         </div>  
                                         <p class="text-sm text-secondary mb-0">
-                                            <span class="email"> 
+                                            <span v-if="request_data.user_type == 'student'" class="email"> 
                                                 <a :href="'mailto:'+request_data.email" class="text-secondary">@{{request_data.email}}</a>
+                                            </span>
+                                            <span v-else class="cnic"> 
+                                                <a href="javascript:void(0);" class="text-secondary">@{{request_data.cnic}}</a>
                                             </span>
                                         </p>
                                     </div>
                                 </div>
                             </td>
                             <td class="text-left text-sm">
-                                <p class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
-                                    @{{request_data.department}}
+                                <p v-if="request_data.user_type == 'student'" class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
+                                    Student
+                                </p>
+                                <p v-if="request_data.user_type == 'staff'" class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
+                                    Staff
                                 </p>
                             </td>
                             <td class="text-left text-sm">
                                 <p class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
-                                    @{{request_data.designation}}
+                                     @{{request_data.designation?request_data.designation: 'Graduated'}}
                                 </p>
                             </td>
                            
@@ -80,19 +86,25 @@
 
                             <td class="text-left">
                                 <p class="text-sm text-secondary font-weight-bold mb-0">
-                                    <span class="badge bg-success m-1" v-if="request_data.request_status"> 
-                                        Approved 
+                                    <span class="badge bg-warning m-1" v-if="request_data.request_status == 'pending'"> 
+                                        Pending 
                                     </span>
-                                    <span class="badge bg-danger m-1" v-else-if="!request_data.request_status"> 
+                                    <span class="badge bg-primary m-1" v-else-if="!request_data.request_status == 'accepted'"> 
+                                        Accepted
+                                    </span>
+                                    <span class="badge bg-success m-1" v-else-if="!request_data.request_status == 'approved'"> 
+                                        Approved
+                                    </span>
+                                    <span class="badge bg-danger m-1" v-else-if="!request_data.request_status == 'rejected'"> 
                                         Rejected
                                     </span>
                                 </p>
-                                @if($session->user_type !== 'student' && $session->user_type !== 'staff')
+                               {{-- @if($session->user_type !== 'student' && $session->user_type !== 'staff')
                                 <div class="form-check form-switch ms-1">
                                     <input v-if="request_data.request_status" class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked="" @change.prevent="change_request_status(request_data)">
                                     <input v-else-if="!request_data.request_status" class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @change.prevent="change_request_status(request_data)">
                                 </div>
-                                @endif
+                                @endif --}}
                             </td>
                           
                       
@@ -104,7 +116,7 @@
 
                     <!-- Display no found message when array is empty -->
                     <div v-if="is_still_request_data == false && all_requests.length <= 0 && !show_loading">
-                        <h5 class='my-4 text-center text-secondary'>No user found</h5>
+                        <h5 class='my-4 text-center text-secondary'>No request found</h5>
                     </div>
                     <div v-if="show_loading" class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                         <span class="sr-only">Loading...</span>

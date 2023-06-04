@@ -126,7 +126,7 @@ const authApp = new Vue({
             if(response.data.data.user_type !== 'student' && response.data.data.user_type !== 'staff'){
               window.location.href = "/";
             } else if(response.data.data.user_type == 'student' || response.data.data.user_type == 'staff'){
-              window.location.href = "/create-clearance";
+              window.location.href = "/create-request";
             }
           }
           else if(response.data.status_code == 400 || response.data.status_code == 401 || response.data.status_code == 402 || response.data.status_code == 404){

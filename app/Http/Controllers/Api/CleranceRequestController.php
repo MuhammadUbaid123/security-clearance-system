@@ -170,7 +170,7 @@ class CleranceRequestController extends Controller
     public function actionOnClearaceReq(Request $request)
     {
         $authUser = Auth::user();
-        $permit_types = ['super_admin', 'concerned_person'];
+        $permit_types = ['admin', 'concerned_person'];
 
         if(!in_array($authUser->user_type, $permit_types)){
             return response()->json([
@@ -240,7 +240,7 @@ class CleranceRequestController extends Controller
                     'type'=> 'success',
                     'message' => 'Operation Performed Successfully!',
                     'data' => [
-                        'status' => $exist->status==1?'Approved':'Rejected',
+                        'status' => $exist->status==1?'approved':'rejected',
                     ]
                 ],200);
             }

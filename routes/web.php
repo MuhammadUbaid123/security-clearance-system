@@ -79,7 +79,7 @@ Route::group(['middleware' => ['login_user']], function (){
     |--------------------------------------------------------------------------
     */
     /* Show Create Clearance */
-    Route::get('/create-clearance', [ClearanceController::class, 'show_create_clearance'])->name('createclearance');
+    Route::get('/create-request', [ClearanceController::class, 'show_create_clearance'])->name('createclearance');
     /* Create Clearance (API) */
     Route::post('/create-clearance', [ClearanceController::class, 'create_clearance']);
 

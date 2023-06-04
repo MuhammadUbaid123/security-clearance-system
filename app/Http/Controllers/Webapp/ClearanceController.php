@@ -50,7 +50,7 @@ class ClearanceController extends Controller
         if($session){
             $token = $session->token;
 
-            $url = env('Api_Base_URL')."api/create-clearance-request";
+            $url = env('API_BASE_URL')."api/create-clearance-request";
     
             $data = array(
                 'st_session' => $request->st_session,
@@ -94,7 +94,7 @@ class ClearanceController extends Controller
             $count = $request->page;
             $search = urlencode($request->search);
 
-            $url = getenv("Api_Base_URL")."api/all-requests?page=$count&search=$search";
+            $url = getenv("API_BASE_URL")."api/all-requests?page=$count&search=$search";
     
             $response = $this->curlGet_token($url, $token);
             return $response;
@@ -112,7 +112,7 @@ class ClearanceController extends Controller
         if($session){
             $token = $session->token;
 
-            $url = getenv("Api_Base_URL")."api/action-on-request";
+            $url = getenv("API_BASE_URL")."api/action-on-request";
 
             $data = array(
                 'request_id' => $request->request_id,
