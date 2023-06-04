@@ -23,12 +23,13 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(['middleware' => ['is_login']], function (){
 
-    /* Signup */
+    /* Show Signup */
     Route::get('/signup', [AuthController::class, 'show_signup'])->name('signup');
+    Route::post('/signup', [AuthController::class, 'signup']);
+
     /* Account Signin */
     Route::get('/signin', [AuthController::class, 'show_signin'])->name('signin');
     Route::post('/signin', [AuthController::class, 'signin']);
-
 });
 
 /* Logout */

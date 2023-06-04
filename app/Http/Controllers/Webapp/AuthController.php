@@ -13,13 +13,39 @@ class AuthController extends Controller
     use Post;
     use Get;
 
-    /* Signup form */
-    public function show_signup(Request $request)
-    {
+    /*
+    |--------------------------------------------------------------------------
+    | Show Signup Screen
+    |--------------------------------------------------------------------------
+    */
+    public function show_signup(Request $request){
         return view('authentication.signup')
             ->with('parent_tab', 'signup')
             ->with('tab_name', 'signup');
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Signup Api
+    |--------------------------------------------------------------------------
+    */
+    public function signup(Request $request){
+        $url = env('API_BASE_URL')."api/signup";
+
+        $data = array(
+            'fname' => $request->fname,
+            'lname' => $request->lname,
+            'user_type' => $request->user_type,
+            'designation' => $request->designation,
+            'cnic' => $request->cnic,
+            'email' => $request->email,
+            'password' => $request->password,
+        );
+            
+        $response = $this->curlPost($url, $data);
+        return $response;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Show Signin Screen
@@ -40,6 +66,8 @@ class AuthController extends Controller
         $url = env('API_BASE_URL')."api/login";
 
         $data = array(
+            'user_type' => $request->user_type,
+            'cnic' => $request->cnic,
             'email' => $request->email,
             'password' => $request->password,
         );

@@ -33,16 +33,29 @@
               <div class="card card-plain">
                 <div class="card-header pb-0 text-start">
                   <h4 class="font-weight-bolder">Sign In</h4>
-                  <p class="mb-0">Enter your email and password to sign In</p>
+                  <p class="mb-0">Enter your credentials to sign In</p>
                 </div>
                 <div class="card-body">
                   <form action="#" method="POST" @submit.prevent="signin()" id="signin_form">
                     <div class="mb-3">
-                      <input type="email" id="email" name="email" v-model="email"  class="form-control form-control-sm" placeholder="Email" aria-label="Email">
+                        <select class="form-control form-control-sm" name="user_type" id="user_type" v-model="user_type">
+                            <option value="" selected>Select Type</option>
+                            <option value="admin">Admin</option>
+                            <option value="concerned_person">Concerned Person</option>
+                            <option value="staff">Staff</option>
+                            <option value="student">Student</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" v-if="user_type !== 'student' && user_type !== '' && user_type !== 'admin'">
+                      <input type="text" id="cnic" name="cnic" v-model="cnic" class="form-control form-control-sm" placeholder="CNIC" aria-label="cnic">
+                    </div>
+                    <div class="mb-3" v-if="user_type == 'student' || user_type == 'admin'">
+                      <input type="email" id="email" name="email" v-model="email" class="form-control form-control-sm" :placeholder="user_type == 'admin' ? 'info@gmail.com' : '19-cs-017@student.hitecuni.edu.pk'" aria-label="Email">
                     </div>
                     <div class="mb-3">
                       <input type="password" id="password" name="password"  v-model="password" class="form-control form-control-sm" placeholder="Password" aria-label="Password">
                     </div>
+                    <a href="{{route('signup')}}" class="link-primary text-sm">Create new account</a>
                     <div class="text-center">
                       <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-3 mb-0">Sign In</button>
                     </div>

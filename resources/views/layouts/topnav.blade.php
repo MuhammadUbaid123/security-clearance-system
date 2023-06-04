@@ -37,7 +37,7 @@
                 </div>
                 <div class="d-block">
                     <div class="d-md-inline text-sm d-none my-auto me-2">   
-                        
+                        {{$session->fname.' '.$session->lname}}
                     </div>
                     <div class="text-xs me-2">
                         <?php 

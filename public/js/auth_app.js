@@ -3,21 +3,30 @@ const authApp = new Vue({
 
   data(){
     return{
-      name: "",
+      fname: "",
+      lname: "",
+      user_type: "",
+      designation: "",
+      cnic: "",
       email: "",
-      type: "user",
       password: "",
       confirm_password: "",
 
-      /*
-      |--------------------------------------------------------------------------
-      | Other Objects
-      |--------------------------------------------------------------------------
-      */
-      specialization: "",
-      experience: "",
-      fees: "",
-      edit_profile_data: [],
+      designation_list: [
+        'Controller of exam',
+        'Accounts office',
+        'Treasurer',
+        'Hitec university hotel',
+        'Cafeteria-1',
+        'Cafeteria-2',
+        'Manager IT',
+        'Library',
+        'Margalla',
+        'DSA',
+        'Dean QA&C',
+        'Manager Admin',
+        'Student\'s supervisor',
+      ],
 
       /*
       |--------------------------------------------------------------------------
@@ -55,61 +64,32 @@ const authApp = new Vue({
 
     /*
     |--------------------------------------------------------------------------
-    | Populate Edit Data Api
+    | Signup Api
     |--------------------------------------------------------------------------
     */
-    populate_edit_data(){
-      this.name = this.edit_profile_data.name;
-      this.email = this.edit_profile_data.email;
-      this.specialization = this.edit_profile_data.specialization;
-      this.experience = this.edit_profile_data.experience;
-      this.fees = this.edit_profile_data.fees;
-    },
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Profile Api
-    |--------------------------------------------------------------------------
-    */
-    update_profile(){
-      if($("#edit_profile_form").valid()){
+    signup(){
+      if($("#signupform").valid()){
 
         let loader = $(".ams-loader");
         loader.css({'display':'flex','z-index':'2000'});
         
         let that  = this;
 
-        /* Getting Image For Uploading
-        |--------------------------- */
-        let photo_input = this.$refs.fileInput;
-        let photo = photo_input.files;
-
-        const form_data = new FormData();
-        
-        if (photo.length) {
-            form_data.append('photo', photo[0]);
-        } else {
-            form_data.append('photo', "");
-        }
-
-        form_data.append('name', that.name);
-        form_data.append('specialization', that.specialization);
-        form_data.append('experience', that.experience);
-        form_data.append('fees', that.fees);
-        form_data.append('password', that.password);
-        form_data.append('confirm_password', that.confirm_password);
-
-        axios.post('/update-profile-settings', form_data)
+        axios.post('/signup', {
+          fname: that.fname,
+          lname: that.lname,
+          user_type: that.user_type,
+          designation: that.designation,
+          cnic: that.cnic,
+          email: that.email,
+          password: that.password
+        })
         .then(response => {
          loader.css('display','none');
-          
           if(response.data.status_code == 200){
-            window.location.href = base_url + "edit-profile";
-          }
-          else if(response.data.status_code == 422){
-            $.map(response.data.error_details,function(elem,index){
-              that.exception_error(elem);
-            });
+            window.location.href = '/signin';
+          } else if(response.data.status_code == 400 || response.data.status_code == 501){
+            that.exception_error(response.data.message);
           }
         })
         .catch(function(error){
@@ -133,6 +113,8 @@ const authApp = new Vue({
         let that  = this;
 
         axios.post('/signin', {
+          user_type: that.user_type,
+          cnic: that.cnic,
           email: that.email,
           password: that.password
         })
@@ -147,10 +129,7 @@ const authApp = new Vue({
               window.location.href = "/create-clearance";
             }
           }
-          else if(response.data.status_code == 402){
-            that.exception_error(response.data.message);
-          }
-          else if(response.data.status_code == 400){
+          else if(response.data.status_code == 400 || response.data.status_code == 401 || response.data.status_code == 402 || response.data.status_code == 404){
             that.exception_error(response.data.message);
           }
         })

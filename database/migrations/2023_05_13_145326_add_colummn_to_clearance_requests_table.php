@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('clearance_requests', function (Blueprint $table) {
-            $table->boolean('request_status')->default(false)->after('approvedd_by_count');
+            $table->string('request_status')->default('pending')->after('approvedd_by_count');
         });
     }
 
