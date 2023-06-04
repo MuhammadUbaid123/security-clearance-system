@@ -40,18 +40,18 @@
                         <tr>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">ID</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Author</th>
-                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Department</th>
+                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Type</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Designation</th>
-                            @if($session->user_type !== 'user')
-                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Status</th> 
-                            @endif
+                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Status</th>
+                            @if($session->user_type == 'admin') 
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Action</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(user_data,index) in all_users" :key="index" >
                             <td class="ps-4">
-                                <span class="text-secondary text-sm font-weight-bold">@{{user_data.id}}</span>
+                                <span class="text-secondary text-sm font-weight-bold">@{{index+1}}</span>
                             </td>
                             <td>
                                 <div class="d-flex px-2 py-1">
@@ -65,24 +65,32 @@
                                             </div>
                                         </div>  
                                         <p class="text-sm text-secondary mb-0">
-                                            <span class="email"> 
+                                            <span v-if="user_data.user_type == 'student'" class="email"> 
                                                 <a :href="'mailto:'+user_data.email" class="text-secondary">@{{user_data.email}}</a>
+                                            </span>
+                                            <span v-else class="cnic"> 
+                                                <a href="javascript:void(0);" class="text-secondary">@{{user_data.cnic}}</a>
                                             </span>
                                         </p>
                                     </div>
                                 </div>
                             </td>
                             <td class="text-left text-sm">
-                                <p class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
-                                    @{{user_data?.department?user_data.department:'Not mentioned'}}
+                                <p v-if="user_data.user_type == 'concerned_person'" class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
+                                    Concerned Person
+                                </p>
+                                <p v-if="user_data.user_type == 'student'" class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
+                                    Student
+                                </p>
+                                <p v-if="user_data.user_type == 'staff'" class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
+                                    Staff
                                 </p>
                             </td>
                             <td class="text-left text-sm">
                                 <p class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
-                                    @{{user_data.designation}}
+                                    @{{user_data.designation?user_data.designation: 'Graduated'}}
                                 </p>
                             </td>
-                            @if($session->user_type !== 'user')
                             <td class="text-left">
                                 <p class="text-sm text-secondary font-weight-bold mb-0">
                                     <span class="badge bg-success m-1" v-if="user_data.status"> 
@@ -92,27 +100,23 @@
                                         Not-Approved 
                                     </span>
                                 </p>
-                                @if($session->user_type !== 'user')
+                                @if($session->user_type == 'admin')
                                 <div class="form-check form-switch ms-1">
                                     <input v-if="user_data.status" class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked="" @change.prevent="change_user_status(user_data)">
                                     <input v-else-if="!user_data.status" class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @change.prevent="change_user_status(user_data)">
                                 </div>
                                 @endif
                             </td>
-                            @endif
+                            @if($session->user_type == 'admin')
                             <td>
                                 <!-- <a href="javascript:void(0);" @click.prevent="view_User(user_data)" class="btn p-2 px-3 m-1" data-toggle="tooltip" data-placement="top" title="View User">
                                     <i class="fa fa-eye text-info"></i>
                                </a> -->
-                                @if($session->user_type !== 'user')
-                                <a :href="set_edit_user_url('<?= route('edituser') ?>', user_data.id)" class="btn p-2 px-3 m-1" data-toggle="tooltip" data-placement="top" title="Edit User">
-                                    <i class="fa fa-edit text-primary"></i>
-                                </a>
                                 <a href="javascript:void(0);" @click.prevent="set_delete_user_obj(user_data)" class="btn p-2 px-3 m-1" data-toggle="tooltip" data-placement="top" title="Delete User">
                                     <i class="fa fa-trash text-danger"></i>
                                 </a>
-                                @endif
                             </td>
+                            @endif
                           
                       
                         </tr>

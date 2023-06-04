@@ -23,7 +23,7 @@ class UserController extends Controller
     public function createUser(Request $request)
     {
         $auth_user = Auth::user(); 
-        $permit_types = ["super_admin","admin"];
+        $permit_types = ["admin"];
         if(!in_array($auth_user->user_type, $permit_types)){
             return response()->json([
                 'status_code' => 401,
@@ -371,22 +371,29 @@ class UserController extends Controller
     public function allUsers(Request $request)
     {
         $auth_user = Auth::user();
-    
+        $permit_types = ["admin", "concerned_person"];
+        if(!in_array($auth_user->user_type, $permit_types)){
+            return response()->json([
+                'status_code' => 401,
+                'type' => 'error',
+                "message" => "You don't have permission to access this api!",
+                "data" => null
+            ], 401);
+        }
 
         /* For manual pagination */
         $page = ($request->page?:1)-1;
         $record_per_page = 10;
         $offset = $page * $record_per_page;
 
-        // $where = [];
-        if($auth_user->user_type!=='super_admin')
-        {
-            $where["id"] = !$auth_user->id;
+        $where = [];
+        if ($auth_user->user_type == 'admin') {
+            $where[] = ['user_type', '!=', 'admin'];
         }
-       
-        if($auth_user->user_type=='concerned_person'){
-            $where['user_type'] = ['!=', 'concerned_person'];
-            $where['user_type'] = ['!=', 'super_admin'];
+        
+        if ($auth_user->user_type == 'concerned_person') {
+            $where[] = ['user_type', '!=', 'concerned_person'];
+            $where[] = ['user_type', '!=', 'admin'];
         }
 
         $data = User::select('users.*')->where($where);
@@ -419,7 +426,6 @@ class UserController extends Controller
             ->limit($record_per_page)
             ->groupBy('id')
             ->get();
-        // return $data;
 
         if($data)
         {

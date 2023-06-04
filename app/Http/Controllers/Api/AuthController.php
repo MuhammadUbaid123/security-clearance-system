@@ -24,7 +24,6 @@ class AuthController extends Controller
             'fname' => 'required',
             'lname' => 'required',
             'user_type' => 'required',
-            'designation' => 'required',
             'password' => 'required',
         ]);
 
@@ -52,7 +51,7 @@ class AuthController extends Controller
         /* if user type is student and not filled the email orr filled incorrect format */
         if($request->user_type=='student')
         {
-            Validator::extend('custom_email_format', function ($attribute, $value, $parameters, $validator) {
+            Validator::extend('email', function ($attribute, $value, $parameters, $validator) {
                 $regex = '/^(19|20|21|22|23)-(CS|ME|EE)-(017|001|023|043)$/i';
             
                 return preg_match($regex, $value);
@@ -60,7 +59,7 @@ class AuthController extends Controller
             
             // Usage:
             $validator_mail = Validator::make($request->all(), [
-                'email' => 'required|unique:users,custom_email_format',
+                'email' => 'required|unique:users,email',
             ]);
             if ($validator_mail->fails()) {
 
@@ -72,17 +71,6 @@ class AuthController extends Controller
                 ], 400);
             }
         }
-
-        /* If user type is concerned person and not filled the email */
-        // if($request->user_type == 'concerned_person' && !$request->email)
-        // {
-        //     return response()->json([
-        //         'status_code' => 400,
-        //         'type' => 'error',
-        //         "message" => "Email format is in-correct!",
-        //         "data" => null
-        //     ], 400);
-        // }
 
         $data = User::create([
             'fname' => $request->fname,

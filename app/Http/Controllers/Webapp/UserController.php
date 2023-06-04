@@ -66,7 +66,7 @@ class UserController extends Controller
                 $photo = new CURLFile($request->photo);
             }
 
-            $url = env('Api_Base_URL')."api/create-user";
+            $url = env('API_BASE_URL')."api/create-user";
     
             $data = array(
                 'fname' => $request->fname,
@@ -124,7 +124,7 @@ class UserController extends Controller
             $count = $request->page;
             $search = urlencode($request->search);
 
-            $url = getenv("Api_Base_URL")."api/all-users?page=$count&search=$search";
+            $url = getenv("API_BASE_URL")."api/all-users?page=$count&search=$search";
     
             $response = $this->curlGet_token($url, $token);
             return $response;
@@ -143,7 +143,7 @@ class UserController extends Controller
             $id = $request->id;
             $token = $session->token;
 
-            $url = getenv("Api_Base_URL")."api/single-user?id=$id";
+            $url = getenv("API_BASE_URL")."api/single-user?id=$id";
             $response = $this->curlGet_token($url, $token);
 
             if($response){
@@ -181,7 +181,7 @@ class UserController extends Controller
                 $photo = new CURLFile($request->photo);
             }
 
-            $url = env('Api_Base_URL')."api/update-user";
+            $url = env('API_BASE_URL')."api/update-user";
     
             $data = array(
                 'id' => $request->id,
@@ -219,7 +219,7 @@ class UserController extends Controller
             $id = $request->id;
             $token = $session->token;
             
-            $url = env('Api_Base_URL')."api/delete-user?id=$id";
+            $url = env('API_BASE_URL')."api/delete-user?id=$id";
 
             $response = $this->curlDelete_token($url, $token);
             return $response;
@@ -237,7 +237,7 @@ class UserController extends Controller
         if($session){
             $token = $session->token;
 
-            $url = getenv("Api_Base_URL")."api/change-user-status";
+            $url = getenv("API_BASE_URL")."api/change-user-status";
 
             $data = array(
                 'id' => $request->id

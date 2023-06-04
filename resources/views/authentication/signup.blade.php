@@ -56,7 +56,7 @@
                             <option value="" selected>Select Designation</option>
                             <option v-for="(data) in designation_list" :value="data">@{{data}}</option>
                         </select>
-                        <input v-else type="text" id="designation" name="designation" v-model="designation" class="form-control form-control-sm" placeholder="Designation" aria-label="designation">
+                        <input v-else-if="user_type !== 'student'" type="text" id="designation" name="designation" v-model="designation" class="form-control form-control-sm" placeholder="Designation" aria-label="designation">
                     </div>
                     <div class="mb-3" v-if="user_type !== 'student' && user_type !== ''">
                       <input type="text" id="cnic" name="cnic" v-model="cnic" class="form-control form-control-sm" placeholder="CNIC" aria-label="cnic">

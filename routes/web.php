@@ -55,11 +55,8 @@ Route::group(['middleware' => ['login_user']], function (){
     |--------------------------------------------------------------------------
     */
     Route::get('/', [UserController::class, 'show_all_users'])->name('home');        
-    /* Show Create User */
-    Route::get('/create-user', [UserController::class, 'show_create_user'])->name('createuser');
-    /* Create User (API Call) */
-    Route::post('/create-user', [UserController::class, 'create_user']);
 
+    /* Show All Users */
     Route::get('/all-users', [UserController::class, 'show_all_users'])->name('allusers');
     /* Get All Users (API Call) */
     Route::post('/get-all-users', [UserController::class, 'get_all_users']);

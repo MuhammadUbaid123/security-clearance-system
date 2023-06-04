@@ -193,7 +193,7 @@ const userApp = new Vue({
             .then(response => {
 
                 that.show_loading = false;
-
+                console.log(response);
                 if (response.data.status_code == 200) {
                     let newly_fetch_data = response.data.data;
                     /* If no posts are coming then we don't need to send request again and need to show All is seen
