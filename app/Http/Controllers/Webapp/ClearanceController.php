@@ -115,8 +115,10 @@ class ClearanceController extends Controller
             $url = getenv("API_BASE_URL")."api/action-on-request";
 
             $data = array(
-                'request_id' => $request->request_id,
-                'status' => $request->status
+                'user_id' => $request->user_id,
+                'request_status' => $request->request_status,
+                'comments' => $request->comments,
+                'miscellaneous' => $request->miscellaneous,
             );
     
             $response = $this->curlPost_token($url, $data, $token);

@@ -15,8 +15,11 @@ class ApprovedBy extends Model
         'user_id',
         'clear_req_id',
         'request_status',
+        'session',
         'miscellaneous',
         'comments',
         'status',
+        'name',
+        'approver_id',
     ];
 }

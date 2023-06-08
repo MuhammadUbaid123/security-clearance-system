@@ -70,16 +70,20 @@ class CleranceRequestController extends Controller
 
         if($data)
         {
-            $users = User::select('users.id')->whereNotIn('users.user_type', ['student', 'staff'])->get();
+            $users = User::select('users.*')->where(function ($query) {
+                $query->where('users.user_type', 'concerned_person')
+                    ->orWhere('users.user_type', 'admin');
+            })->get();
 
             
-            for($i=0; $i<count($users); $i++){
+            foreach($users as $obj){
 
-                $approved_bies = ApprovedBy::create([
-                    'user_id' => $authUser?->id,
-                    'name' => $authUser?->fname." ".$authUser?->lname,
-                    'clear_req_id' => $data?->id,
-                    'approver_id' => $users[$i]?->id
+                ApprovedBy::create([
+                    'user_id' => $authUser->id,
+                    'name' => $obj->fname." ".$obj->lname,
+                    'clear_req_id' => $data->id,
+                    'session' => $data->session,
+                    'approver_id' => $obj->id
                 ]);
 
                 /* Creating Notification */
@@ -87,17 +91,18 @@ class CleranceRequestController extends Controller
                     'name' => $authUser->fname." ".$authUser->lname." Requested for Clearance!",
                     'type' => "Clearance",
                     'type_id' => $authUser->id,
-                    'user_id' => $users[$i]->id,
+                    'user_id' => $obj->id,
                 ]);
 
 
                 if($create_notification)
                 {
-                    $dataObj = User::select("users.notification_count", "users.id")->where('users.id','=', $users[$i]->id)->first();
+                    $dataObj = User::select("users.notification_count", "users.id")->where('users.id','=', $obj->id)->first();
                     $dataObj->notification_count++;
                     $dataObj->save();
                 }
             }
+
             return response()->json([
                 'status_code' => 201,
                 'type'=> 'success',
@@ -180,7 +185,7 @@ class CleranceRequestController extends Controller
             ], 401);
         }
         $validator = Validator::make($request->all(), [
-            'request_id' => 'required',
+            'user_id' => 'required',
             'request_status' => 'required',
         ]);
 
@@ -193,87 +198,66 @@ class CleranceRequestController extends Controller
             ],400);
         }
 
-        $reqdata = ClearanceRequest::where('id', $request->request_id)->first();
+        $reqdata = ClearanceRequest::where('requester_id', $request->user_id)->first();
 
         if($reqdata)
         {
-            $exist = ApprovedBy::where('clear_req_id', $reqdata->id)->where('approver_id', $authUser->id)->first();
+            $exist = ApprovedBy::where('clear_req_id', $reqdata->id)->first();
 
-            // return $exist;exit;
             if($exist)
             {
-                $exist->name = $authUser->fname." ".$authUser->lname;
-
-                if($request->request_status=='rejected')
-                {
-                    if(!$request->comments && !$request->miscellaneous)
+                if($exist->approver_id == NULL){
+                    $exist->name = $authUser->fname." ".$authUser->lname;
+                    if($request->request_status=='rejected')
                     {
-                        return response()->json([
-                            'status_code' => 400,
-                            'type'=> 'error',
-                            'message' => 'Comments or miscellaneous cant be empty!',
-                        ],400);
-                    }
-                    $exist->comments = $request->comments ?? $exist->comments;
-                    $exist->miscellaneous = $request->miscellaneous ?? $exist->miscellaneous;
-
-                    
-                }else{
+                        if(!$request->comments && !$request->miscellaneous)
+                        {
+                            return response()->json([
+                                'status_code' => 400,
+                                'type'=> 'error',
+                                'message' => 'Comments or miscellaneous cant be empty!',
+                            ],400);
+                        } else{
+                            $exist->comments = $request->comments ?? $exist->comments;
+                            $exist->miscellaneous = $request->miscellaneous ?? $exist->miscellaneous;
+                        }
+                    } 
                     $exist->request_status = $request->request_status;
-                }
-                $exist->save();
+                    $exist->status = $request->request_status=='approved' ? 1 : 0;
+                    $exist->save();
 
-                if($exist->request_status == 'accepted')
-                {
-                    $reqdata->approvedd_by_count++;
+                    if($exist->request_status == 'approved')
+                    {
+                        $reqdata->approvedd_by_count++;
+                    }
+                    if($reqdata->approvedd_by_count == $reqdata->req_to_members)
+                    {
+                        $reqdata->request_status = 'approved';
+                    }
                     $reqdata->save();
-                }
 
-                if($reqdata->approvedd_by_count == $reqdata->req_to_members)
-                {
-                    $reqdata->request_status = 1;
-                    $reqdata->save();
+                    return response()->json([
+                        'status_code' => 200,
+                        'type'=> 'success',
+                        'message' => 'Operation Performed Successfully!',
+                        'data' => [
+                            'status' => $exist->status=='approved' ?'approved':'rejected',
+                        ]
+                    ],200);
+                } else{
+                    return response()->json([
+                        'status_code' => 404,
+                        'type'=> 'error',
+                        'message' => 'You cannot change your request anymore',
+                    ],404);
                 }
-
-                return response()->json([
-                    'status_code' => 200,
-                    'type'=> 'success',
-                    'message' => 'Operation Performed Successfully!',
-                    'data' => [
-                        'status' => $exist->status==1?'approved':'rejected',
-                    ]
-                ],200);
             }
 
-            // if($data)
-            // {
-            //     if($data->status == 1)
-            //     {
-            //         $reqdata->approvedd_by_count++;
-            //         $reqdata->save();
-            //     }
-
-            //     if($reqdata->approvedd_by_count == $reqdata->req_to_members)
-            //     {
-            //         $reqdata->request_status = 1;
-            //         $reqdata->save();
-            //     }
-            //     return response()->json([
-            //         'status_code' => 200,
-            //         'type'=> 'success',
-            //         'message' => 'Operation Performed Successfully!',
-            //         'data' => [
-            //             'status' => $data->status==1?'Approved':'Rejected',
-            //         ]
-            //     ],200);
-            // }
-
-
             return response()->json([
-                'status_code' => 501,
+                'status_code' => 403,
                 'type'=> 'error',
                 'message' => 'Operation could not Perform!',
-            ],501);
+            ],403);
         }
 
         return response()->json([
@@ -281,7 +265,6 @@ class CleranceRequestController extends Controller
             'type'=> 'error',
             'message' => 'Request Not Found!',
         ],404);
-
     }
 
     /* All clearance requests */
@@ -289,31 +272,30 @@ class CleranceRequestController extends Controller
     {
         $authUser = Auth::user();
 
-        $permit_types = ['student', 'staff'];
-
-        // if(in_array($authUser->user_type, $permit_types)){
-        //     return response()->json([
-        //         'status_code' => 401,
-        //         'type'=> 'error',
-        //         "message" => "You don't have permission to access this api!",
-        //     ], 401);
-        // }
         /* For manual pagination */
         $page = ($request->page?:1)-1;
         $record_per_page = 10;
         $offset = $page * $record_per_page;
         
         $where = [];
+        $allReqs = [];
+        $searchBySession = "";
 
-        if(in_array($authUser->user_type, $permit_types))
+        if($authUser->user_type == 'student' || $authUser->user_type == 'staff')
         {
             $where = [
                 'requester_id' => $authUser->id
             ];
+            $allReqs = ClearanceRequest::select('clearance_requests.requester_id', 'clearance_requests.session', 'clearance_requests.request_status', 'users.*')->where($where)->leftJoin('users', 'users.id', 'clearance_requests.requester_id');
+            // $searchBySession = "clearance_requests.session";
+        } 
+        else if ($authUser->user_type == 'concerned_person' || $authUser->user_type == 'admin'){
+            $where = [
+                'approved_bies.approver_id' => $authUser->id
+            ];
+            $allReqs = ApprovedBy::select('approved_bies.user_id', 'approved_bies.session', 'approved_bies.request_status', 'users.*')->where($where)->leftJoin('users', 'users.id', 'approved_bies.user_id');
+            // $searchBySession = "approved_bies.session";
         }
-
-
-        $allReqs = ClearanceRequest::select('clearance_requests.requester_id', 'clearance_requests.session', 'clearance_requests.request_status', 'users.*')->where($where)->leftJoin('users', 'users.id', 'clearance_requests.requester_id');
 
         $search = $request->search;
         if($search)
@@ -330,7 +312,7 @@ class CleranceRequestController extends Controller
                 $query->orWhere("users.department", "like", "%".$search."%");
                 $query->orWhere("users.user_type", "like", "%".$search."%");
                 $query->orWhere("users.designation", "like", "%".$search."%");
-                $query->orWhere("clearance_requests.session", "like", "%".$search."%");
+                // $query->orWhere($searchBySession, "like", "%".$search."%");
             }); 
         }
 

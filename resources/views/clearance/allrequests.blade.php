@@ -40,7 +40,7 @@
                     <tbody>
                         <tr v-for="(request_data,index) in all_requests" :key="index" >
                             <td class="ps-4">
-                                <span class="text-secondary text-sm font-weight-bold">@{{request_data.id}}</span>
+                                <span class="text-secondary text-sm font-weight-bold">@{{index+1}}</span>
                             </td>
                             <td>
                                 <div class="d-flex px-2 py-1">
@@ -89,22 +89,20 @@
                                     <span class="badge bg-warning m-1" v-if="request_data.request_status == 'pending'"> 
                                         Pending 
                                     </span>
-                                    <span class="badge bg-primary m-1" v-else-if="!request_data.request_status == 'accepted'"> 
-                                        Accepted
-                                    </span>
-                                    <span class="badge bg-success m-1" v-else-if="!request_data.request_status == 'approved'"> 
+                                    <span class="badge bg-success m-1" v-else-if="request_data.request_status == 'approved'"> 
                                         Approved
                                     </span>
-                                    <span class="badge bg-danger m-1" v-else-if="!request_data.request_status == 'rejected'"> 
+                                    <span class="badge bg-danger m-1" v-else-if="request_data.request_status == 'rejected'"> 
                                         Rejected
                                     </span>
                                 </p>
-                               {{-- @if($session->user_type !== 'student' && $session->user_type !== 'staff')
-                                <div class="form-check form-switch ms-1">
-                                    <input v-if="request_data.request_status" class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked="" @change.prevent="change_request_status(request_data)">
-                                    <input v-else-if="!request_data.request_status" class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @change.prevent="change_request_status(request_data)">
-                                </div>
-                                @endif --}}
+                               @if($session->user_type !== 'student' && $session->user_type !== 'staff')
+                                    <select class="form-control form-control-sm" name="request_status" :disabled="request_data.request_status !== 'pending' ? true : false" v-model="request_data.request_status" @change.prevent="change_request_status(request_data)">
+                                        <option value="pending" disabled>Pending</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                @endif
                             </td>
                           
                       
@@ -128,33 +126,39 @@
             </div>
         </div>
 
-        <!-- Modal for Delete User -->
-        <!-- <div class="modal fade" id="modal-delete-user" tabindex="-1" role="dialog" aria-hidden="true">
+        <!-- Modal for Rejected User -->
+        <div class="modal fade" id="modal-rejected-user" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h6 class="modal-title" id="modal-title-notification">
-                            Delete User
-                        </h6>
-                        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="py-3 text-center">
-                            <i class="fa fa-trash fa-3x text-danger"></i>
-                            <h4 class="text-secondary mt-4">
-                                Are you sure to delete this user permanently?
-                            </h4>
+                    <form action="javascript:void(0);" method="POST" @submit.prevent="reject_request('rejecteds')">
+                        <div class="modal-header">
+                            <h6 class="modal-title" id="modal-title-notification">
+                                Reject Request
+                            </h6>
+                            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-white text-secondary ml-auto" data-bs-dismiss="modal">No</button>
-                        <button type="button" @click.prevent="delete_user()" class="btn btn-white text-danger ml-auto" data-bs-dismiss="modal">Yes</button>
-                    </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label class="form-label">Comments *</label>
+                                    <textarea class="form-control" name="comments" v-model="comments" rows="3" required placeholder="Write Comments..."></textarea>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label class="form-label">Miscellaneous *</label>
+                                    <textarea class="form-control" name="miscellaneous" v-model="miscellaneous" rows="4" required placeholder="Write Miscellaneous..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-white text-secondary ml-auto" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-white text-danger ml-auto">Save</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </div> -->
+        </div>
 
          <!-- View User Information Modal -->
          <!-- <div class="modal fade" id="view_user_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">

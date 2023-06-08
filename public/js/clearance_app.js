@@ -15,8 +15,10 @@ const clearanceApp = new Vue({
         search: "",                   // Declaring Variable for Search Function
         all_requests: [],
         delete_user_id: "",           // Declaring Variable for Deleting Blog
-
         user_information: "",
+        comments: "",
+        miscellaneous: "",
+        request_data: "",
 
         /*
         |--------------------------------------------------------------------------
@@ -29,7 +31,6 @@ const clearanceApp = new Vue({
         is_pagination_active: true,             // Initially pagination is active
         is_get_request_sent: false,        // User data request is false initially
         is_still_request_data: true,               // User data request exist initially
-
       }
     },
   
@@ -146,38 +147,53 @@ const clearanceApp = new Vue({
         | Change Request Status
         |--------------------------------------------------------------------------
         */
+        reject_request(){
+            let that = this;
+            that.change_request_status(that.request_data);
+        },
         change_request_status(request_data){
-            /* Loading animation while request is in progress
-            |---------------------------------------------- */
-            let loader = $(".ams-loader");
-            loader.css({'display':'flex','z-index':'2000'});
-
             let that = this;
 
-            axios.post('/action-on-request', {
-                request_id: request_data.id,
-                status: request_data.request_status
-            })
-            .then(response => {
-                loader.css('display','none');
-                if (response.data.status_code == 200) {
+            that.request_data = request_data;
 
-                    if(response.data.data == 'Approved'){
-                        request_data.request_status = true;
-                    } else if(response.data.data == 'Rejected'){
-                        request_data.request_status = false;
+            if(request_data.request_status == 'rejected' && (!that.comments && !that.miscellaneous)){
+                $('#modal-rejected-user').modal('show');
+            } else{
+                $('#modal-rejected-user').modal('hide');
+
+                /* Loading animation while request is in progress
+                |---------------------------------------------- */
+                let loader = $(".ams-loader");
+                loader.css({'display':'flex','z-index':'2000'});
+
+                axios.post('/action-on-request', {
+                    user_id: request_data.user_id,
+                    request_status: request_data.request_status,
+                    comments: that.comments,
+                    miscellaneous: that.miscellaneous,
+                })
+                .then(response => {
+                    loader.css('display','none');
+                    if (response.data.status_code == 200) {
+    
+                        if(response.data.data == 'approved'){
+                            request_data.request_status = 'approved';
+                        } else if(response.data.data == 'rejected'){
+                            request_data.request_status = 'rejected';
+                        }
+    
+                    } else if (response.data.status_code == 401) {
+                        that.redirect_unauthenticated_user();
+                    } else if (response.data.status_code == 403 || response.data.status_code == 404) {
+                        request_data.request_status = 'pending';
+                        that.exception_error(response.data.message);
                     }
-
-                } else if (response.data.status_code == 401) {
-                    that.redirect_unauthenticated_user();
-                } else if (response.data.status_code == 404) {
-                    that.exception_error(response.data.message);
-                }
-            })
-            .catch(function(error) {
-                loader.css('display','none');
-                that.internal_error();
-            });
+                })
+                .catch(function(error) {
+                    loader.css('display','none');
+                    that.internal_error();
+                });
+            }
         },
 
 
