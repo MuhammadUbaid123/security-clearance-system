@@ -90,4 +90,7 @@ Route::group(['middleware' => ['login_user']], function (){
 
     /* Change Request Status (API Call) */
     Route::post('/action-on-request', [ClearanceController::class, 'change_request_status']);
+
+    /* View Challan Form */
+    Route::get('/challan', [ClearanceController::class, 'show_challan'])->name('challan');
 });

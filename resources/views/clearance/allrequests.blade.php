@@ -31,6 +31,7 @@
                         <tr>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">ID</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Author</th>
+                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Progress</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Type</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Designation</th>
                             <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Session</th>
@@ -65,6 +66,14 @@
                                 </div>
                             </td>
                             <td class="text-left text-sm">
+                                <div class="progress ms-3" style="height: 20px; width: 130px;">
+                                    <div v-if="!request_data.approvedd_by_count" class="progress-bar bg-light text-dark" role="progressbar" style="width:100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                        0 %
+                                    </div>
+                                    <div v-else class="progress-bar" role="progressbar" :style="{ width: progressBarWidth(request_data)+'%' }" :aria-valuenow="progressBarWidth(request_data)" aria-valuemin="0" aria-valuemax="100">@{{ progressBarWidth(request_data) }} %</div>
+                                </div>
+                            </td>
+                            <td class="text-left text-sm">
                                 <p v-if="request_data.user_type == 'student'" class="text-sm text-secondary font-weight-bold mb-0" style="white-space: normal;">
                                     Student
                                 </p>
@@ -96,8 +105,14 @@
                                         Rejected
                                     </span>
                                 </p>
-                               @if($session->user_type !== 'student' && $session->user_type !== 'staff')
+                               @if($session->user_type == 'concerned_person')
                                     <select class="form-control form-control-sm" name="request_status" :disabled="request_data.request_status !== 'pending' ? true : false" v-model="request_data.request_status" @change.prevent="change_request_status(request_data)">
+                                        <option value="pending" disabled>Pending</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                @elseif($session->user_type == 'admin')
+                                    <select class="form-control form-control-sm" name="request_status" :disabled="enableStatusForAdmin(request_data)" v-model="request_data.request_status" @change.prevent="change_request_status(request_data)">
                                         <option value="pending" disabled>Pending</option>
                                         <option value="approved">Approved</option>
                                         <option value="rejected">Rejected</option>

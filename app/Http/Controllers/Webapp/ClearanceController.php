@@ -41,6 +41,25 @@ class ClearanceController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | Show Challan Form
+    |--------------------------------------------------------------------------
+    */ 
+    public function show_challan(Request $request){
+        $session = $request->session()->get("login_data");
+
+        if($session && $session->user_type == 'student' || $session->user_type == 'staff'){
+            return view('clearance.challan')
+            ->with('session', $session)
+            ->with('parent_tab', '')
+            ->with('tab_name', '');
+        }
+        else{
+            return redirect("404");
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Create Clearance Api
     |--------------------------------------------------------------------------
     */ 

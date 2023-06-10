@@ -202,11 +202,11 @@ class CleranceRequestController extends Controller
 
         if($reqdata)
         {
-            $exist = ApprovedBy::where('clear_req_id', $reqdata->id)->first();
+            $exist = ApprovedBy::where('clear_req_id', $reqdata->id)->where('approver_id', $authUser->id)->first();
 
             if($exist)
             {
-                if($exist->approver_id == NULL){
+                if($exist->request_status == 'pending'){
                     $exist->name = $authUser->fname." ".$authUser->lname;
                     if($request->request_status=='rejected')
                     {
@@ -241,7 +241,9 @@ class CleranceRequestController extends Controller
                         'type'=> 'success',
                         'message' => 'Operation Performed Successfully!',
                         'data' => [
-                            'status' => $exist->status=='approved' ?'approved':'rejected',
+                            'status' => $exist->request_status == 'approved' ?'approved':'rejected',
+                            'req_to_members' => $reqdata->req_to_members,
+                            'approvedd_by_count' => $reqdata->approvedd_by_count,
                         ]
                     ],200);
                 } else{
@@ -286,14 +288,19 @@ class CleranceRequestController extends Controller
             $where = [
                 'requester_id' => $authUser->id
             ];
-            $allReqs = ClearanceRequest::select('clearance_requests.requester_id', 'clearance_requests.session', 'clearance_requests.request_status', 'users.*')->where($where)->leftJoin('users', 'users.id', 'clearance_requests.requester_id');
+            $allReqs = ClearanceRequest::select('clearance_requests.requester_id', 'clearance_requests.session', 'clearance_requests.request_status', 'clearance_requests.approvedd_by_count', 'clearance_requests.req_to_members', 'users.*')
+            ->where($where)
+            ->leftJoin('users', 'users.id', 'clearance_requests.requester_id');
             // $searchBySession = "clearance_requests.session";
         } 
         else if ($authUser->user_type == 'concerned_person' || $authUser->user_type == 'admin'){
             $where = [
                 'approved_bies.approver_id' => $authUser->id
             ];
-            $allReqs = ApprovedBy::select('approved_bies.user_id', 'approved_bies.session', 'approved_bies.request_status', 'users.*')->where($where)->leftJoin('users', 'users.id', 'approved_bies.user_id');
+            $allReqs = ApprovedBy::select('approved_bies.user_id', 'approved_bies.session', 'approved_bies.request_status', 'clearance_requests.approvedd_by_count', 'clearance_requests.req_to_members', 'users.*')
+            ->where($where)
+            ->leftJoin('users', 'users.id', 'approved_bies.user_id')
+            ->leftJoin('clearance_requests', 'approved_bies.clear_req_id', 'clearance_requests.id');
             // $searchBySession = "approved_bies.session";
         }
 

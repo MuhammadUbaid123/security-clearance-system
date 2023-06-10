@@ -35,6 +35,32 @@ const clearanceApp = new Vue({
     },
   
     methods:{
+        
+        /*
+        |--------------------------------------------------------------------------
+        | Enable Status For Admin
+        |--------------------------------------------------------------------------
+        */
+        enableStatusForAdmin(data){
+            const totalCount = data.req_to_members !== null ? data.req_to_members : 0;
+            const currentCount = data.approvedd_by_count !== null ? data.approvedd_by_count : 0;
+            if(data.request_status !== 'pending' || parseInt(totalCount - currentCount) > 1 ){
+                return true;
+            } else {
+              return false;  
+            }
+        },
+
+        /*
+        |--------------------------------------------------------------------------
+        | Calculate Progress Bar
+        |--------------------------------------------------------------------------
+        */
+        progressBarWidth(data) {
+            const totalCount = data.req_to_members !== null ? data.req_to_members : 0;
+            const currentCount = data.approvedd_by_count !== null ? data.approvedd_by_count : 0;
+            return parseInt((currentCount / totalCount) * 100);
+        },
 
         /*
         |--------------------------------------------------------------------------
@@ -172,14 +198,17 @@ const clearanceApp = new Vue({
                     comments: that.comments,
                     miscellaneous: that.miscellaneous,
                 })
-                .then(response => {
+                .then((response) => {
                     loader.css('display','none');
                     if (response.data.status_code == 200) {
-    
-                        if(response.data.data == 'approved'){
+                        if(response.data.data.status == 'approved'){
                             request_data.request_status = 'approved';
-                        } else if(response.data.data == 'rejected'){
+                            request_data.req_to_members = response.data.data.req_to_members;
+                            request_data.approvedd_by_count = response.data.data.approvedd_by_count;
+                        } else if(response.data.data.status == 'rejected'){
                             request_data.request_status = 'rejected';
+                            request_data.req_to_members = response.data.data.req_to_members;
+                            request_data.approvedd_by_count = response.data.data.approvedd_by_count;
                         }
     
                     } else if (response.data.status_code == 401) {

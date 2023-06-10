@@ -28,7 +28,12 @@
         </div> -->
         </div>
         <ul class="navbar-nav justify-content-center">
-
+        <li class="nav-item px-3 d-flex align-items-center">
+            <a href="{{route('challan')}}" target="_blank" class="nav-link text-white btn btn-primary my-auto" title="Print Challan">
+                <i class="fa fa-file me-1 fixed-plugin-button-nav cursor-pointer"></i>
+                Challan
+            </a>
+        </li>
         <li class="nav-item d-flex align-items-center dropdown bg-transparent">
             <!-- Logout Buton Enable For (X-large, Large, Medium) Sceen -->
             <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#exampleModal" title="Logout" class="d-lg-flex d-none align-items-center nav-link text-white font-weight-bold py-1 px-2 border border-sm-0 rounded-pill">

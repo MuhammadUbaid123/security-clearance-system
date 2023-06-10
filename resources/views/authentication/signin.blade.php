@@ -55,7 +55,15 @@
                     <div class="mb-3">
                       <input type="password" id="password" name="password"  v-model="password" class="form-control form-control-sm" placeholder="Password" aria-label="Password">
                     </div>
-                    <a href="{{route('signup')}}" class="link-primary text-sm">Create new account</a>
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <a href="{{route('signup')}}" class="link-primary text-sm">Create new account</a>
+                      </div>
+                      <div>
+                        <a href="https://www.hitecuni.edu.pk/About/ChairmanMessage.aspx" target="_blank" class="link-primary text-sm me-2">About Us</a>
+                        <a href="https://www.hitecuni.edu.pk/About/FindUs.aspx" target="_blank" class="link-primary text-sm">Contact Us</a>
+                      </div>
+                    </div>
                     <div class="text-center">
                       <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-3 mb-0">Sign In</button>
                     </div>

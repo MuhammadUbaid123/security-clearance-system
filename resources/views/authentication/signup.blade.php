@@ -70,7 +70,15 @@
                     <div class="mb-3">
                       <input type="password" id="confirm_password" name="confirm_password"  v-model="confirm_password" class="form-control form-control-sm" placeholder="Confirm Password" aria-label="Confirm password">
                     </div>
-                    <a href="{{route('signin')}}" class="link-primary text-sm">Already have an account</a>
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <a href="{{route('signin')}}" class="link-primary text-sm">Already have an account</a>
+                      </div>
+                      <div>
+                        <a href="https://www.hitecuni.edu.pk/About/ChairmanMessage.aspx" target="_blank" class="link-primary text-sm me-2">About Us</a>
+                        <a href="https://www.hitecuni.edu.pk/About/FindUs.aspx" target="_blank" class="link-primary text-sm">Contact Us</a>
+                      </div>
+                    </div>
                     <div class="text-center">
                       <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-3 mb-0">Sign Up</button>
                     </div>
