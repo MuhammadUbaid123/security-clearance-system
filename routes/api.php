@@ -44,6 +44,9 @@ Route::delete('/delete-user', [UserController::class, 'deleteUser'])->middleware
 /* All users */
 Route::get('/all-users', [UserController::class, 'allUsers'])->middleware("auth:api");
 
+/* Update User Settings */
+Route::post('/update-user-settings', [UserController::class, 'update_user_settings'])->middleware("auth:api");
+
 /*
 |--------------------------------------------------------------------------
 | Clearance Request

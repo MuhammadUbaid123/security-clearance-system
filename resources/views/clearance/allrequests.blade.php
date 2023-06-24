@@ -94,7 +94,7 @@
                             </td>
 
                             <td class="text-left">
-                                <p class="text-sm text-secondary font-weight-bold mb-0">
+                                <p class="text-lg text-secondary font-weight-bold mb-0">
                                     <span class="badge bg-warning m-1" v-if="request_data.request_status == 'pending'"> 
                                         Pending 
                                     </span>
@@ -105,7 +105,29 @@
                                         Rejected
                                     </span>
                                 </p>
-                               @if($session->user_type == 'concerned_person')
+                                @if($session->user_type == 'student' || $session->user_type == 'staff')
+                                    <div v-if="request_data.approved_by_users.length">
+                                        <ul v-for="approvedBies in request_data.approved_by_users" class="list-group list-unstyled">
+                                            <li class="lh-sm">
+                                                <div>
+                                                    <small class="ms-2 text-secondary" style="font-size: 13px;">@{{approvedBies.name}}</small>
+                                                    <small>
+                                                        <span class="badge bg-warning m-1" v-if="approvedBies.request_status == 'pending'"> 
+                                                            Pending 
+                                                        </span>
+                                                        <span class="badge bg-success m-1" v-else-if="approvedBies.request_status == 'approved'"> 
+                                                            Approved
+                                                        </span>
+                                                        <span role="button" @click.prevent="view_rejection_detail(approvedBies)" class="badge bg-danger m-1" v-else-if="approvedBies.request_status == 'rejected'"> 
+                                                            Rejected
+                                                        </span>
+                                                    </small>
+                                                </div>
+                                            </li>   
+                                        </ul>
+                                    </div>
+                                @endif
+                                @if($session->user_type == 'concerned_person')
                                     <select class="form-control form-control-sm" name="request_status" :disabled="request_data.request_status !== 'pending' ? true : false" v-model="request_data.request_status" @change.prevent="change_request_status(request_data)">
                                         <option value="pending" disabled>Pending</option>
                                         <option value="approved">Approved</option>
@@ -175,31 +197,32 @@
             </div>
         </div>
 
-         <!-- View User Information Modal -->
-         <!-- <div class="modal fade" id="view_user_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+         <!-- View Rejection Information Modal -->
+         <div class="modal fade" id="view-rejection-details" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">User Detail</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Rejection Cause</h5>
                     <button type="button" class="close btn-close text-dark" style="line-height: 10px !important;" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true" style="font-size: x-large;">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h4 class="text-muted">@{{user_information.title}}</h4>
-                    <p class="text-justify">
-                        @{{user_information.description}}
+                    <label class="text-lg">Comments</label>
+                    <p class="text-sm ms-2">
+                        @{{rejection_details.comments}}
                     </p>
-                    <div>
-                        <img :src="user_information.blog_photo"  class="w-100">
-                    </div>
+                    <label class="text-lg">Miscellaneous</label>
+                    <p class="text-sm ms-2">
+                        @{{rejection_details.miscellaneous}}
+                    </p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
-        </div> -->
+        </div>
 
 
     </div>
@@ -215,6 +238,12 @@
     <script>
         $(document).ready(function(){
             clearanceApp.get_all_requests();
+            /* Prevent From Disableing Status Field If Required Fields Are Empty While Rejecting */
+            $('#modal-rejected-user').on('hidden.bs.modal', function(e) {
+                if(!clearanceApp.$data.is_status_change){
+                    clearanceApp.$data.request_data.request_status = "pending";
+                }
+            });
         });
     </script>
 

@@ -248,4 +248,91 @@ class UserController extends Controller
         }
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Change User Settings
+    |--------------------------------------------------------------------------
+    */ 
+    public function show_edit_settings(Request $request){
+        $session = $request->session()->get("login_data");
+
+        if($session){
+            // $id = $request->id;
+            $token = $session->token;
+            $id = $session->id;
+
+            $url = getenv("API_BASE_URL")."api/single-user?id=$id";
+            $response = $this->curlGet_token($url, $token);
+
+            if($response){
+                $edit_user_data = json_decode($response);
+                if($edit_user_data->status_code == 200){
+                    return view('users.editsettings')
+                    ->with('session', $session)
+                    ->with('edit_user_data', $edit_user_data->data)
+                    ->with('parent_tab', 'users')
+                    ->with('tab_name', 'edit_user');
+                }
+                else{
+                    return redirect("404");
+                }
+            }
+        }
+        else{
+            return redirect("404");
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update User Settings
+    |--------------------------------------------------------------------------
+    */ 
+    public function update_user_settings(Request $request){
+        $session = $request->session()->get("login_data");
+        
+        if($session){
+            $token = $session->token;
+
+            $photo = "";
+            if($request->photo){
+                $photo = new CURLFile($request->photo);
+            }
+
+            $url = env('API_BASE_URL')."api/update-user-settings";
+    
+            $data = array(
+                'id' => $request->id,
+                'fname' => $request->fname,
+                'lname' => $request->lname,
+                'password' => $request->password,
+                'photo' => $photo
+            );
+    
+            $response = $this->curlPost_token($url, $data, $token);
+            $data = json_decode($response);
+
+            /* For changing the updated photo, name in a session */
+            if(@$data->data){
+
+                $login_data = $request->session()->get("login_data");
+        
+                if($data->data->photo){
+                    $login_data->photo = $data->data->photo;
+                }
+
+                if($data->data->fname){
+                    $login_data->fname = $data->data->fname;
+                }
+
+                if($data->data->lname){
+                    $login_data->lname = $data->data->lname;
+                }
+
+                $request->session()->put("login_data", $login_data);
+            }
+            
+            return $response;
+        }
+    }
 }

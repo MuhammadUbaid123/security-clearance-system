@@ -341,7 +341,12 @@ class CleranceRequestController extends Controller
                 }
                 else{
                     $user->photo = URL::to('/')."/storage/images/user/default-img.png";
-                }    
+                }
+                
+                $approvedBies = "";
+                $approvedBies = ApprovedBy::select('*')
+                    ->where('approved_bies.user_id', '=', $authUser->id)->get();
+                $user->approved_by_users = $approvedBies;
             }
 
             return response()->json([

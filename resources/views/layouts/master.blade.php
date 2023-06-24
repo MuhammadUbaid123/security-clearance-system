@@ -48,7 +48,7 @@
         $uriArray = explode('/', $uri);
         $url_name = $uriArray[1];
         if($url_name == '' || $url_name == 'all-users' || $url_name == 'create-user' || $url_name == 'edit-user' || 
-          $url_name == 'create-request' || $url_name == 'all-requests'){
+          $url_name == 'create-request' || $url_name == 'all-requests' || $url_name == 'settings'){
           $base_url = getenv('Base_URL');
           $url_image = $base_url.'assets/img/hitec1.jpeg';
           echo "<div class='position-absolute w-100 min-height-300 top-0' 

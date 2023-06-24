@@ -93,7 +93,7 @@
         </li>
         @if($session->user_type != 'admin')
         <li class="nav-item px-3 d-flex align-items-center">
-            <a href="" class="nav-link text-white p-0" title="Profile Settings">
+            <a href="{{route('settings')}}" class="nav-link text-white p-0" title="Profile Settings">
                 <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
             </a>
         </li>

@@ -174,7 +174,67 @@ const edituserApp = new Vue({
             });
         }
       },
-  
+      
+      /*
+      |--------------------------------------------------------------------------
+      | Populate Data To Edit Settings
+      |--------------------------------------------------------------------------
+      */
+      populate_edit_settings_data(){
+        this.id = this.edit_user_data.id;
+        this.fname = this.edit_user_data.fname;
+        this.lname = this.edit_user_data.lname;
+      },
+
+      /*
+      |--------------------------------------------------------------------------
+      | Update User Settings
+      |--------------------------------------------------------------------------
+      */
+      update_user_settings(){
+        if($("#edit_user_settings_form").valid()){
+            let loader = $(".ams-loader");
+            loader.css({'display':'flex','z-index':'2000'});
+            
+            let that  = this;
+            
+            /* Getting Image For Uploading
+            |--------------------------- */
+            let photo_input = this.$refs.fileInput;
+            let photo = photo_input.files;
+
+            let form_data = new FormData();
+
+            if (photo.length) {
+                form_data.append('photo', photo[0]);
+            } else {
+                form_data.append('photo', "");
+            }
+
+            form_data.append('id', that.id);
+            form_data.append('fname', that.fname);
+            form_data.append('lname', that.lname);
+            form_data.append('password', that.password);
+
+            axios.post('/update-user-settings', form_data)
+            .then(response => {
+                loader.css('display','none');
+                
+                if(response.data.status_code == 200){
+                    window.location.href = base_url + "settings";
+                }
+                else if(response.data.status_code == 422){
+                    $.map(response.data.error_details,function(elem,index){
+                        that.exception_error(elem);
+                    });
+                }
+            })
+            .catch(function(error){
+                loader.css('display','none');
+                that.internal_error();
+            });
+        }
+      },
   
       /*
       |--------------------------------------------------------------------------

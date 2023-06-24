@@ -93,4 +93,9 @@ Route::group(['middleware' => ['login_user']], function (){
 
     /* View Challan Form */
     Route::get('/challan', [ClearanceController::class, 'show_challan'])->name('challan');
+
+    /* Show User Settings */
+    Route::get('/settings', [UserController::class, 'show_edit_settings'])->name('settings');
+    /* Update User Settings (API Call) */
+    Route::post('/update-user-settings', [UserController::class, 'update_user_settings']);
 });

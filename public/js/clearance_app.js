@@ -19,6 +19,7 @@ const clearanceApp = new Vue({
         comments: "",
         miscellaneous: "",
         request_data: "",
+        rejection_details: "",
 
         /*
         |--------------------------------------------------------------------------
@@ -31,6 +32,7 @@ const clearanceApp = new Vue({
         is_pagination_active: true,             // Initially pagination is active
         is_get_request_sent: false,        // User data request is false initially
         is_still_request_data: true,               // User data request exist initially
+        is_status_change: false
       }
     },
   
@@ -184,6 +186,7 @@ const clearanceApp = new Vue({
 
             if(request_data.request_status == 'rejected' && (!that.comments && !that.miscellaneous)){
                 $('#modal-rejected-user').modal('show');
+                return;
             } else{
                 $('#modal-rejected-user').modal('hide');
 
@@ -205,10 +208,12 @@ const clearanceApp = new Vue({
                             request_data.request_status = 'approved';
                             request_data.req_to_members = response.data.data.req_to_members;
                             request_data.approvedd_by_count = response.data.data.approvedd_by_count;
+                            that.is_status_change = true;
                         } else if(response.data.data.status == 'rejected'){
                             request_data.request_status = 'rejected';
                             request_data.req_to_members = response.data.data.req_to_members;
                             request_data.approvedd_by_count = response.data.data.approvedd_by_count;
+                            that.is_status_change = true;
                         }
     
                     } else if (response.data.status_code == 401) {
@@ -288,6 +293,18 @@ const clearanceApp = new Vue({
                 loader.css('display','none');
                 that.internal_error();
             });
+        },
+
+        /*
+        |--------------------------------------------------------------------------
+        | View Rejection Details
+        |--------------------------------------------------------------------------
+        */
+        view_rejection_detail(data){
+            let that = this;
+            console.log(data);
+            that.rejection_details = data;
+            $("#view-rejection-details").modal('show');
         },
 
         /*
